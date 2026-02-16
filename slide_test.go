@@ -3,8 +3,6 @@ package main
 import (
 	"strings"
 	"testing"
-
-	"github.com/spf13/afero"
 )
 
 func TestSlide(t *testing.T) {
@@ -55,7 +53,7 @@ func TestSlide(t *testing.T) {
 
 	t.Run("directory prefix", func(t *testing.T) {
 		buf := setupTestFs(t, testFixture)
-		afero.WriteFile(appFs, "mydir/slides.md", []byte(testFixture), 0o644)
+		writeTestFile(t, "mydir/slides.md", testFixture)
 		cmd := SlideCmd{Exprs: []string{"mydir/2"}}
 		if err := cmd.Run(); err != nil {
 			t.Fatalf("SlideCmd.Run() error: %v", err)
@@ -68,7 +66,7 @@ func TestSlide(t *testing.T) {
 
 	t.Run("multiple sources", func(t *testing.T) {
 		buf := setupTestFs(t, testFixture)
-		afero.WriteFile(appFs, "other/slides.md", []byte(testFixture), 0o644)
+		writeTestFile(t, "other/slides.md", testFixture)
 		cmd := SlideCmd{Exprs: []string{"1:2", "other/4"}}
 		if err := cmd.Run(); err != nil {
 			t.Fatalf("SlideCmd.Run() error: %v", err)

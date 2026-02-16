@@ -1,10 +1,6 @@
 package main
 
-import (
-	"testing"
-
-	"github.com/spf13/afero"
-)
+import "testing"
 
 func TestSlides(t *testing.T) {
 	t.Run("default file", func(t *testing.T) {
@@ -21,7 +17,7 @@ func TestSlides(t *testing.T) {
 
 	t.Run("directory with trailing slash", func(t *testing.T) {
 		buf := setupTestFs(t, testFixture)
-		afero.WriteFile(appFs, "mydir/slides.md", []byte(testFixture), 0o644)
+		writeTestFile(t, "mydir/slides.md", testFixture)
 		cmd := SlidesCmd{Exprs: []string{"mydir/"}}
 		if err := cmd.Run(); err != nil {
 			t.Fatalf("SlidesCmd.Run() error: %v", err)
@@ -46,7 +42,7 @@ func TestSlides(t *testing.T) {
 
 	t.Run("multiple sources", func(t *testing.T) {
 		buf := setupTestFs(t, testFixture)
-		afero.WriteFile(appFs, "other/slides.md", []byte(testFixture), 0o644)
+		writeTestFile(t, "other/slides.md", testFixture)
 		cmd := SlidesCmd{Exprs: []string{"1,3", "other/2-4"}}
 		if err := cmd.Run(); err != nil {
 			t.Fatalf("SlidesCmd.Run() error: %v", err)

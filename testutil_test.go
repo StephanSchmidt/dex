@@ -50,8 +50,15 @@ func setupTestFs(t *testing.T, content string) *bytes.Buffer {
 	appFs = afero.NewMemMapFs()
 	buf := &bytes.Buffer{}
 	stdout = buf
-	afero.WriteFile(appFs, "slides.md", []byte(content), 0o644)
+	writeTestFile(t, "slides.md", content)
 	return buf
+}
+
+func writeTestFile(t *testing.T, path, content string) {
+	t.Helper()
+	if err := afero.WriteFile(appFs, path, []byte(content), 0o644); err != nil {
+		t.Fatalf("writing %s: %v", path, err)
+	}
 }
 
 func getTitles(t *testing.T) []string {

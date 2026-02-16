@@ -1,16 +1,12 @@
 package main
 
-import (
-	"testing"
-
-	"github.com/spf13/afero"
-)
+import "testing"
 
 func TestCopy(t *testing.T) {
 	t.Run("cross-file copy", func(t *testing.T) {
 		setupTestFs(t, testFixture)
-		afero.WriteFile(appFs, "dir1/slides.md", []byte(testFixture), 0o644)
-		afero.WriteFile(appFs, "dir2/slides.md", []byte(testFixture2), 0o644)
+		writeTestFile(t, "dir1/slides.md", testFixture)
+		writeTestFile(t, "dir2/slides.md", testFixture2)
 
 		cmd := CopyCmd{Source: "dir1/1-2", Target: "dir2/3"}
 		if err := cmd.Run(); err != nil {
@@ -48,8 +44,8 @@ func TestCopy(t *testing.T) {
 
 	t.Run("copy to end (n+1)", func(t *testing.T) {
 		setupTestFs(t, testFixture)
-		afero.WriteFile(appFs, "dir1/slides.md", []byte(testFixture), 0o644)
-		afero.WriteFile(appFs, "dir2/slides.md", []byte(testFixture2), 0o644)
+		writeTestFile(t, "dir1/slides.md", testFixture)
+		writeTestFile(t, "dir2/slides.md", testFixture2)
 
 		cmd := CopyCmd{Source: "dir1/1", Target: "dir2/4"}
 		if err := cmd.Run(); err != nil {
@@ -65,7 +61,7 @@ func TestCopy(t *testing.T) {
 
 	t.Run("error: position out of range", func(t *testing.T) {
 		setupTestFs(t, testFixture)
-		afero.WriteFile(appFs, "dir2/slides.md", []byte(testFixture2), 0o644)
+		writeTestFile(t, "dir2/slides.md", testFixture2)
 
 		cmd := CopyCmd{Source: "1", Target: "dir2/5"}
 		if err := cmd.Run(); err == nil {
@@ -75,7 +71,7 @@ func TestCopy(t *testing.T) {
 
 	t.Run("relative path", func(t *testing.T) {
 		setupTestFs(t, testFixture)
-		afero.WriteFile(appFs, "../other/slides.md", []byte(testFixture2), 0o644)
+		writeTestFile(t, "../other/slides.md", testFixture2)
 
 		cmd := CopyCmd{Source: "../other/1-2", Target: "3"}
 		if err := cmd.Run(); err != nil {
