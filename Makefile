@@ -26,7 +26,7 @@ upgrade-deps:
 	go mod tidy
 	go test ./...
 
-install:
+install: build check
 	go install .
 
 clean:

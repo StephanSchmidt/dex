@@ -65,8 +65,8 @@ func (c *NewCmd) Run() error {
 	}
 
 	fmt.Fprintln(stdout)
-	fmt.Fprintf(stdout, "Created %s\n", dir)
-	fmt.Fprintf(stdout, "Run: make dev PRES=%s\n", slug)
+	fmt.Fprintf(stdout, "Created %s\n", dir)   // #nosec G705 -- CLI output, not web
+	fmt.Fprintf(stdout, "Run: make dev PRES=%s\n", slug) // #nosec G705 -- CLI output, not web
 	return nil
 }
 
