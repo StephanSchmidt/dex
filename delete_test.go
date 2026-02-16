@@ -46,9 +46,9 @@ func TestDelete(t *testing.T) {
 		}
 	})
 
-	t.Run("preserves frontmatter on remaining slides", func(t *testing.T) {
+	t.Run("preserves metadata on remaining slides", func(t *testing.T) {
 		setupTestFs(t, testFixture)
-		// Slide 3 has frontmatter (layout: center); delete slide 2 and check slide 3 keeps it.
+		// Slide 3 has metadata (layout: center); delete slide 2 and check slide 3 keeps it.
 		cmd := DeleteCmd{Expr: "2"}
 		if err := cmd.Run(); err != nil {
 			t.Fatalf("Run() error: %v", err)
@@ -56,8 +56,8 @@ func TestDelete(t *testing.T) {
 		data, _ := afero.ReadFile(appFs, "slides.md")
 		d := activeFormat.Parse(data)
 		// After deleting B (index 1), C moves to index 1.
-		if d.Slides[1].Frontmatter == "" {
-			t.Error("expected frontmatter on slide C, got empty")
+		if d.Slides[1].Metadata == "" {
+			t.Error("expected metadata on slide C, got empty")
 		}
 	})
 

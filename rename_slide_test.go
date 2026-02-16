@@ -46,7 +46,7 @@ func TestRenameSlide(t *testing.T) {
 		}
 	})
 
-	t.Run("preserves frontmatter", func(t *testing.T) {
+	t.Run("preserves metadata", func(t *testing.T) {
 		setupTestFs(t, testFixture)
 		cmd := RenameSlideCmd{Expr: "3", Name: "NewC"}
 		if err := cmd.Run(); err != nil {
@@ -54,8 +54,8 @@ func TestRenameSlide(t *testing.T) {
 		}
 		data, _ := afero.ReadFile(appFs, "slides.md")
 		d := activeFormat.Parse(data)
-		if d.Slides[2].Frontmatter == "" {
-			t.Error("expected frontmatter on slide 3, got empty")
+		if d.Slides[2].Metadata == "" {
+			t.Error("expected metadata on slide 3, got empty")
 		}
 		titles := getTitles(t)
 		want := []string{"A", "B", "NewC", "D"}

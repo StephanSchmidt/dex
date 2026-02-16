@@ -16,7 +16,7 @@ func TestRename(t *testing.T) {
 		}
 		data, _ := afero.ReadFile(appFs, "slides.md")
 		d := activeFormat.Parse(data)
-		if got := extractFrontmatterTitle(d.Frontmatter); got != "New Deck" {
+		if got := extractMetadataTitle(d.Metadata); got != "New Deck" {
 			t.Errorf("got %q, want %q", got, "New Deck")
 		}
 		// Slides must be untouched.
@@ -36,7 +36,7 @@ func TestRename(t *testing.T) {
 		}
 		data, _ := afero.ReadFile(appFs, "slides.md")
 		d := activeFormat.Parse(data)
-		if got := extractFrontmatterTitle(d.Frontmatter); got != "Added" {
+		if got := extractMetadataTitle(d.Metadata); got != "Added" {
 			t.Errorf("got %q, want %q", got, "Added")
 		}
 	})
@@ -51,12 +51,12 @@ func TestRename(t *testing.T) {
 		}
 		data, _ := afero.ReadFile(appFs, "mydir/slides.md")
 		d := activeFormat.Parse(data)
-		if got := extractFrontmatterTitle(d.Frontmatter); got != "Dir Deck" {
+		if got := extractMetadataTitle(d.Metadata); got != "Dir Deck" {
 			t.Errorf("got %q, want %q", got, "Dir Deck")
 		}
 	})
 
-	t.Run("other frontmatter preserved", func(t *testing.T) {
+	t.Run("other metadata preserved", func(t *testing.T) {
 		setupTestFs(t, testFixture)
 		cmd := RenameCmd{Name: "Renamed", File: "slides.md"}
 		if err := cmd.Run(); err != nil {
@@ -64,22 +64,22 @@ func TestRename(t *testing.T) {
 		}
 		data, _ := afero.ReadFile(appFs, "slides.md")
 		d := activeFormat.Parse(data)
-		if got := extractFrontmatterTitle(d.Frontmatter); got != "Renamed" {
+		if got := extractMetadataTitle(d.Metadata); got != "Renamed" {
 			t.Errorf("title: got %q, want %q", got, "Renamed")
 		}
-		if got := extractFrontmatterField(d.Frontmatter, "theme"); got != "default" {
+		if got := extractMetadataField(d.Metadata, "theme"); got != "default" {
 			t.Errorf("theme: got %q, want %q", got, "default")
 		}
 	})
 }
 
-// extractFrontmatterTitle returns the value of the title: line in frontmatter.
-func extractFrontmatterTitle(fm string) string {
-	return extractFrontmatterField(fm, "title")
+// extractMetadataTitle returns the value of the title: line in metadata.
+func extractMetadataTitle(fm string) string {
+	return extractMetadataField(fm, "title")
 }
 
-// extractFrontmatterField returns the value of a top-level key: value line.
-func extractFrontmatterField(fm, key string) string {
+// extractMetadataField returns the value of a top-level key: value line.
+func extractMetadataField(fm, key string) string {
 	prefix := key + ":"
 	for _, line := range strings.Split(fm, "\n") {
 		if strings.HasPrefix(line, prefix) {

@@ -2,14 +2,14 @@ package format
 
 // Slide represents a single slide in a presentation.
 type Slide struct {
-	Frontmatter string // raw YAML (empty string if none)
-	Content     string // raw markdown content
+	Metadata string // format-specific metadata (empty string if none)
+	Content  string // raw slide content
 }
 
 // Deck represents a complete presentation.
 type Deck struct {
-	Frontmatter string
-	Slides      []Slide
+	Metadata string
+	Slides   []Slide
 }
 
 // Insert returns a new deck with newSlides inserted before position pos (0-based).
@@ -18,7 +18,7 @@ func (d Deck) Insert(pos int, newSlides []Slide) Deck {
 	result = append(result, d.Slides[:pos]...)
 	result = append(result, newSlides...)
 	result = append(result, d.Slides[pos:]...)
-	return Deck{Frontmatter: d.Frontmatter, Slides: result}
+	return Deck{Metadata: d.Metadata, Slides: result}
 }
 
 // ScaffoldFile describes a file or directory to create when scaffolding a new presentation.

@@ -104,7 +104,7 @@ func TestInsert(t *testing.T) {
 		}
 	})
 
-	t.Run("frontmatter preserved", func(t *testing.T) {
+	t.Run("metadata preserved", func(t *testing.T) {
 		setupTestFs(t, testFixture)
 
 		cmd := InsertCmd{Pos: "2", Title: "New"}
@@ -117,8 +117,8 @@ func TestInsert(t *testing.T) {
 			t.Fatalf("reading slides.md: %v", err)
 		}
 		d := activeFormat.Parse(data)
-		if !strings.Contains(d.Frontmatter, "title: Test") {
-			t.Error("deck frontmatter not preserved")
+		if !strings.Contains(d.Metadata, "title: Test") {
+			t.Error("deck metadata not preserved")
 		}
 	})
 }

@@ -55,11 +55,11 @@ func TestParse(t *testing.T) {
 		}
 	})
 
-	t.Run("deck frontmatter", func(t *testing.T) {
+	t.Run("deck metadata", func(t *testing.T) {
 		d := f.Parse([]byte(fixture))
 		want := "theme: default\ntitle: Test\n"
-		if d.Frontmatter != want {
-			t.Errorf("deck frontmatter:\ngot:  %q\nwant: %q", d.Frontmatter, want)
+		if d.Metadata != want {
+			t.Errorf("deck metadata:\ngot:  %q\nwant: %q", d.Metadata, want)
 		}
 	})
 
@@ -68,16 +68,16 @@ func TestParse(t *testing.T) {
 		if got := d.Slides[0].Content; got != "\n# A\n\n" {
 			t.Errorf("slide 1 content: got %q", got)
 		}
-		if d.Slides[0].Frontmatter != "" {
-			t.Errorf("slide 1 should have no frontmatter, got %q", d.Slides[0].Frontmatter)
+		if d.Slides[0].Metadata != "" {
+			t.Errorf("slide 1 should have no metadata, got %q", d.Slides[0].Metadata)
 		}
 	})
 
-	t.Run("slide with frontmatter", func(t *testing.T) {
+	t.Run("slide with metadata", func(t *testing.T) {
 		d := f.Parse([]byte(fixture))
 		s := d.Slides[2] // slide C has layout: center
-		if s.Frontmatter != "layout: center\n" {
-			t.Errorf("slide 3 frontmatter: got %q, want %q", s.Frontmatter, "layout: center\n")
+		if s.Metadata != "layout: center\n" {
+			t.Errorf("slide 3 metadata: got %q, want %q", s.Metadata, "layout: center\n")
 		}
 		if got := s.Content; got != "\n# C\n\n" {
 			t.Errorf("slide 3 content: got %q", got)
@@ -109,12 +109,12 @@ func TestRender(t *testing.T) {
 		if len(d.Slides) != len(d2.Slides) {
 			t.Fatalf("slide count: got %d, want %d", len(d2.Slides), len(d.Slides))
 		}
-		if d.Frontmatter != d2.Frontmatter {
-			t.Errorf("frontmatter: got %q, want %q", d2.Frontmatter, d.Frontmatter)
+		if d.Metadata != d2.Metadata {
+			t.Errorf("metadata: got %q, want %q", d2.Metadata, d.Metadata)
 		}
 		for i := range d.Slides {
-			if d.Slides[i].Frontmatter != d2.Slides[i].Frontmatter {
-				t.Errorf("slide %d frontmatter: got %q, want %q", i+1, d2.Slides[i].Frontmatter, d.Slides[i].Frontmatter)
+			if d.Slides[i].Metadata != d2.Slides[i].Metadata {
+				t.Errorf("slide %d metadata: got %q, want %q", i+1, d2.Slides[i].Metadata, d.Slides[i].Metadata)
 			}
 		}
 	})
@@ -157,7 +157,7 @@ func TestDefaultFile(t *testing.T) {
 }
 
 func TestRenderSlide(t *testing.T) {
-	t.Run("without frontmatter", func(t *testing.T) {
+	t.Run("without metadata", func(t *testing.T) {
 		s := format.Slide{Content: "\n# A\n\n"}
 		got := f.RenderSlide(s)
 		want := "---\n\n# A\n\n"
@@ -166,8 +166,8 @@ func TestRenderSlide(t *testing.T) {
 		}
 	})
 
-	t.Run("with frontmatter", func(t *testing.T) {
-		s := format.Slide{Frontmatter: "layout: center\n", Content: "\n# C\n\n"}
+	t.Run("with metadata", func(t *testing.T) {
+		s := format.Slide{Metadata: "layout: center\n", Content: "\n# C\n\n"}
 		got := f.RenderSlide(s)
 		want := "---\nlayout: center\n---\n\n# C\n\n"
 		if got != want {
@@ -248,32 +248,32 @@ func TestNewSlide(t *testing.T) {
 
 func TestRenameDeck(t *testing.T) {
 	t.Run("replace existing title", func(t *testing.T) {
-		d := format.Deck{Frontmatter: "theme: default\ntitle: Old\n"}
+		d := format.Deck{Metadata: "theme: default\ntitle: Old\n"}
 		got := f.RenameDeck(d, "New")
-		if !strings.Contains(got.Frontmatter, "title: New") {
-			t.Errorf("expected title replaced, got %q", got.Frontmatter)
+		if !strings.Contains(got.Metadata, "title: New") {
+			t.Errorf("expected title replaced, got %q", got.Metadata)
 		}
-		if strings.Contains(got.Frontmatter, "title: Old") {
-			t.Errorf("old title still present: %q", got.Frontmatter)
+		if strings.Contains(got.Metadata, "title: Old") {
+			t.Errorf("old title still present: %q", got.Metadata)
 		}
 	})
 
 	t.Run("add title when missing", func(t *testing.T) {
-		d := format.Deck{Frontmatter: "theme: default\n"}
+		d := format.Deck{Metadata: "theme: default\n"}
 		got := f.RenameDeck(d, "Added")
-		if !strings.Contains(got.Frontmatter, "title: Added") {
-			t.Errorf("expected title added, got %q", got.Frontmatter)
+		if !strings.Contains(got.Metadata, "title: Added") {
+			t.Errorf("expected title added, got %q", got.Metadata)
 		}
 	})
 
 	t.Run("preserve other keys", func(t *testing.T) {
-		d := format.Deck{Frontmatter: "theme: seriph\ntitle: Old\nclass: text-center\n"}
+		d := format.Deck{Metadata: "theme: seriph\ntitle: Old\nclass: text-center\n"}
 		got := f.RenameDeck(d, "New")
-		if !strings.Contains(got.Frontmatter, "theme: seriph") {
-			t.Errorf("theme lost: %q", got.Frontmatter)
+		if !strings.Contains(got.Metadata, "theme: seriph") {
+			t.Errorf("theme lost: %q", got.Metadata)
 		}
-		if !strings.Contains(got.Frontmatter, "class: text-center") {
-			t.Errorf("class lost: %q", got.Frontmatter)
+		if !strings.Contains(got.Metadata, "class: text-center") {
+			t.Errorf("class lost: %q", got.Metadata)
 		}
 	})
 }

@@ -14,13 +14,13 @@ var titleAttrRe = regexp.MustCompile(`title="([^"]+)"`)
 // Format implements format.Format for Slidev markdown presentations.
 type Format struct{}
 
-// Parse splits a Slidev markdown file into its document frontmatter
+// Parse splits a Slidev markdown file into its document metadata
 // and individual slides.
 func (Format) Parse(data []byte) format.Deck {
 	// Split into blocks separated by "---" lines.
 	//   blocks[0] = before first --- (empty)
-	//   blocks[1] = document frontmatter
-	//   blocks[2+] = slide content or per-slide frontmatter
+	//   blocks[1] = document metadata
+	//   blocks[2+] = slide content or per-slide metadata
 	var blocks []string
 	var cur strings.Builder
 	lines := strings.Split(string(data), "\n")
@@ -42,16 +42,16 @@ func (Format) Parse(data []byte) format.Deck {
 
 	var d format.Deck
 	if len(blocks) > 1 {
-		d.Frontmatter = blocks[1]
+		d.Metadata = blocks[1]
 	}
 
-	// From block 2 onward, each block is either per-slide frontmatter
+	// From block 2 onward, each block is either per-slide metadata
 	// (followed by a content block) or slide content directly.
 	for i := 2; i < len(blocks); i++ {
 		if i+1 < len(blocks) && isFrontmatter(blocks[i]) {
 			d.Slides = append(d.Slides, format.Slide{
-				Frontmatter: blocks[i],
-				Content:     blocks[i+1],
+				Metadata: blocks[i],
+				Content:  blocks[i+1],
 			})
 			i++ // skip content block
 		} else {
@@ -67,11 +67,11 @@ func (Format) Parse(data []byte) format.Deck {
 func (Format) Render(d format.Deck) []byte {
 	var buf strings.Builder
 	buf.WriteString("---\n")
-	buf.WriteString(d.Frontmatter)
+	buf.WriteString(d.Metadata)
 	for _, s := range d.Slides {
 		buf.WriteString("---\n")
-		if s.Frontmatter != "" {
-			buf.WriteString(s.Frontmatter)
+		if s.Metadata != "" {
+			buf.WriteString(s.Metadata)
 			buf.WriteString("---\n")
 		}
 		buf.WriteString(s.Content)
@@ -104,8 +104,8 @@ func (Format) DefaultFile() string {
 func (Format) RenderSlide(s format.Slide) string {
 	var buf strings.Builder
 	buf.WriteString("---\n")
-	if s.Frontmatter != "" {
-		buf.WriteString(s.Frontmatter)
+	if s.Metadata != "" {
+		buf.WriteString(s.Metadata)
 		buf.WriteString("---\n")
 	}
 	buf.WriteString(s.Content)
@@ -143,10 +143,10 @@ func (Format) NewSlide(title string) format.Slide {
 	return format.Slide{Content: "\n# " + title + "\n\n"}
 }
 
-// RenameDeck returns a copy of the deck with the frontmatter title: field
+// RenameDeck returns a copy of the deck with the metadata title: field
 // set to name. If no title: line exists, one is appended.
 func (Format) RenameDeck(d format.Deck, name string) format.Deck {
-	lines := strings.Split(d.Frontmatter, "\n")
+	lines := strings.Split(d.Metadata, "\n")
 	replaced := false
 	for i, line := range lines {
 		if strings.HasPrefix(line, "title:") {
@@ -156,9 +156,9 @@ func (Format) RenameDeck(d format.Deck, name string) format.Deck {
 		}
 	}
 	if replaced {
-		d.Frontmatter = strings.Join(lines, "\n")
+		d.Metadata = strings.Join(lines, "\n")
 	} else {
-		d.Frontmatter += "title: " + name + "\n"
+		d.Metadata += "title: " + name + "\n"
 	}
 	return d
 }

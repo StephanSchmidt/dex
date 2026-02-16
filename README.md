@@ -1,6 +1,6 @@
 # dex
 
-A CLI tool for manipulating [Slidev](https://sli.dev) markdown presentations.
+A CLI tool for manipulating slide presentations ([Slidev](https://sli.dev) markdown and [reveal.js](https://revealjs.com) HTML).
 
 ## Features
 
@@ -12,7 +12,7 @@ A CLI tool for manipulating [Slidev](https://sli.dev) markdown presentations.
 | `delete` | Delete slides from a deck | `dex delete 3` |
 | `insert` | Insert a new blank slide at a position | `dex insert 3 "New Slide"` |
 | `move` | Reorder slides within a deck | `dex move 2 4` |
-| `rename` | Rename the deck title in frontmatter | `dex rename "New Title"` |
+| `rename` | Rename the deck title in metadata | `dex rename "New Title"` |
 | `rename-slide` | Rename a slide's title | `dex rename-slide 3 "Hi"` |
 | `new` | Scaffold a new presentation directory | `dex new "My Talk"` |
 
@@ -24,8 +24,9 @@ go install github.com/StephanSchmidt/dex@latest
 
 ## Usage
 
-Each presentation is a directory containing a `slides.md` file.
-`dir/` or `dir` resolves to `dir/slides.md`; bare ranges use `./slides.md`.
+Each presentation is a directory containing a `slides.md` (Slidev) or `index.html` (reveal.js) file.
+The format is auto-detected from the file extension; use `--format` to override.
+`dir/` or `dir` resolves to the default file for the active format; bare ranges use the current directory.
 
 ### Addressing
 
@@ -50,7 +51,7 @@ dex delete acme/1,3         # delete slides 1 and 3 from acme/
 dex insert 3 "New Slide"    # insert a new slide before slide 3
 dex insert acme/2 "Intro"   # insert at position 2 in acme/
 dex move 2 4                # move slide 2 to position 4
-dex rename "New Title"          # rename the deck title in frontmatter
+dex rename "New Title"          # rename the deck title in metadata
 dex rename "New Title" acme/    # rename deck in acme/slides.md
 dex rename-slide 3 "New Title"  # rename slide 3
 dex rename-slide acme/3 "Hi"   # rename slide 3 in acme/slides.md
