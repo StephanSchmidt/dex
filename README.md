@@ -20,6 +20,15 @@ A CLI tool for manipulating slide presentations ([Slidev](https://sli.dev) markd
 
 ## Installation
 
+### Homebrew
+
+```sh
+brew tap StephanSchmidt/dex
+brew install dex
+```
+
+### Go
+
 ```sh
 go install github.com/StephanSchmidt/dex@latest
 ```

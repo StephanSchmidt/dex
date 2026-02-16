@@ -1,0 +1,35 @@
+version: 2
+project_name: dex
+before:
+  hooks:
+    - go mod tidy
+builds:
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w -X main.version={{.Version}}
+archives:
+  - formats: ['tar.gz']
+    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
+checksum:
+  name_template: 'checksums.txt'
+changelog:
+  sort: asc
+brews:
+  - repository:
+      owner: StephanSchmidt
+      name: homebrew-dex
+      token: "{{ .Env.HOMEBREW_DEX_TOKEN }}"
+    homepage: "https://github.com/StephanSchmidt/dex"
+    description: "CLI tool for manipulating slide presentations"
+    license: "MIT"
+    install: |
+      bin.install "dex"
+    test: |
+      assert_match version.to_s, shell_output("#{bin}/dex --version")

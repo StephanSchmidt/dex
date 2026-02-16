@@ -1,4 +1,4 @@
-.PHONY: build test lint check nilcheck sec upgrade-deps install clean
+.PHONY: build test lint check nilcheck sec upgrade-deps install release clean
 
 build: go-imports
 	go build .
@@ -28,6 +28,11 @@ upgrade-deps:
 
 install: build check
 	go install .
+
+release:
+	@if [ -z "$(VERSION)" ]; then echo "Usage: make release VERSION=0.1.0"; exit 1; fi
+	git tag v$(VERSION)
+	git push origin v$(VERSION)
 
 clean:
 	go clean -cache -i

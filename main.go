@@ -9,12 +9,15 @@ import (
 	"github.com/spf13/afero"
 )
 
+var version = "dev"
+
 var appFs afero.Fs = afero.NewOsFs()
 var stdout io.Writer = os.Stdout
 
 var cli struct {
-	Format      string         `help:"Presentation format (slidev, revealjs). Auto-detected from file extension if omitted." enum:"slidev,revealjs," default:""`
-	New         NewCmd         `cmd:"" help:"Scaffold a new presentation directory."`
+	Format      string           `help:"Presentation format (slidev, revealjs). Auto-detected from file extension if omitted." enum:"slidev,revealjs," default:""`
+	Version     kong.VersionFlag `help:"Print version and exit." short:"v"`
+	New         NewCmd           `cmd:"" help:"Scaffold a new presentation directory."`
 	Copy        CopyCmd        `cmd:"" help:"Copy slides from source deck into target deck before a given position. Source is unchanged."`
 	Delete      DeleteCmd      `cmd:"" help:"Delete one or more slides from a deck."`
 	Insert      InsertCmd      `cmd:"" help:"Insert a new blank slide with the given title at a position."`
@@ -30,6 +33,7 @@ var cli struct {
 func main() {
 	ctx := kong.Parse(&cli,
 		kong.Name("dex"),
+		kong.Vars{"version": version},
 		kong.Description(`Manipulate slide presentations (Slidev markdown or reveal.js HTML).
 Format is auto-detected from file extension (.md → Slidev, .html → reveal.js).
 Use --format to override. Each presentation is a directory with a default file.
