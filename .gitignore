@@ -1,0 +1,19 @@
+# Compiled binary
+dex
+
+# IDE / editor
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Claude Code local settings
+.claude/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Presentation output
+presentations/
