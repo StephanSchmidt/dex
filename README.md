@@ -9,6 +9,7 @@ A CLI tool for manipulating [Slidev](https://sli.dev) markdown presentations.
 | `slides` | List slide numbers and titles | `dex slides acme/` |
 | `slide` | Print raw slide markdown | `dex slide 3` |
 | `copy` | Copy slides between decks | `dex copy dir1/1-3 dir2/5` |
+| `delete` | Delete slides from a deck | `dex delete 3` |
 | `move` | Reorder slides within a deck | `dex move 2 4` |
 | `rename` | Rename the deck title in frontmatter | `dex rename "New Title"` |
 | `rename-slide` | Rename a slide's title | `dex rename-slide 3 "Hi"` |
@@ -43,6 +44,8 @@ dex slides                  # list all slides in ./slides.md
 dex slides acme/            # list slides in acme/slides.md
 dex slide 3                 # print raw markdown of slide 3
 dex copy dir1/1-3 dir2/5    # copy slides 1-3 from dir1, insert before slide 5 in dir2
+dex delete 3                # delete slide 3
+dex delete acme/1,3         # delete slides 1 and 3 from acme/
 dex move 2 4                # move slide 2 to position 4
 dex rename "New Title"          # rename the deck title in frontmatter
 dex rename "New Title" acme/    # rename deck in acme/slides.md
