@@ -47,7 +47,7 @@ Examples:
   dex copy dir1/2 dir2/4        append to dir2 (position 4 = after last of 3 slides)
   dex move 2 4                  move slide 2 to position 4 in ./slides.md
   dex move 3 1 acme/            move slide 3 to the front in acme/slides.md
-  dex new "My Talk"             scaffold presentations/my-talk/`),
+  dex new "My Talk"             scaffold my-talk/`),
 		kong.UsageOnError(),
 	)
 	if err := ctx.Run(); err != nil {

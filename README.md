@@ -40,7 +40,7 @@ dex slides acme/            # list slides in acme/slides.md
 dex slide 3                 # print raw markdown of slide 3
 dex copy dir1/1-3 dir2/5    # copy slides 1-3 from dir1, insert before slide 5 in dir2
 dex move 2 4                # move slide 2 to position 4
-dex new "My Talk"           # scaffold presentations/my-talk/
+dex new "My Talk"           # scaffold my-talk/
 ```
 
 ## Build & Test

@@ -34,7 +34,7 @@ func (c *NewCmd) Run() error {
 		return fmt.Errorf("title produces an empty slug")
 	}
 
-	dir := filepath.Join("presentations", slug)
+	dir := slug
 
 	if _, err := appFs.Stat(dir); err == nil {
 		return fmt.Errorf("%s already exists", dir)
