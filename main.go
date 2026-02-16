@@ -13,11 +13,13 @@ var appFs afero.Fs = afero.NewOsFs()
 var stdout io.Writer = os.Stdout
 
 var cli struct {
-	New    NewCmd    `cmd:"" help:"Scaffold a new presentation directory."`
-	Copy   CopyCmd   `cmd:"" help:"Copy slides from source deck into target deck before a given position. Source is unchanged."`
-	Move   MoveCmd   `cmd:"" help:"Move a slide to a different position within one deck file."`
-	Slide  SlideCmd  `cmd:"" help:"Print raw slide markdown to stdout (read-only)."`
-	Slides SlidesCmd `cmd:"" help:"List slide numbers and titles to stdout (read-only)."`
+	New         NewCmd         `cmd:"" help:"Scaffold a new presentation directory."`
+	Copy        CopyCmd        `cmd:"" help:"Copy slides from source deck into target deck before a given position. Source is unchanged."`
+	Move        MoveCmd        `cmd:"" help:"Move a slide to a different position within one deck file."`
+	Rename      RenameCmd      `cmd:"" help:"Rename the deck title in frontmatter."`
+	RenameSlide RenameSlideCmd `cmd:"rename-slide" help:"Rename a slide's title."`
+	Slide       SlideCmd       `cmd:"" help:"Print raw slide markdown to stdout (read-only)."`
+	Slides      SlidesCmd      `cmd:"" help:"List slide numbers and titles to stdout (read-only)."`
 }
 
 func main() {
@@ -47,6 +49,11 @@ Examples:
   dex copy dir1/2 dir2/4        append to dir2 (position 4 = after last of 3 slides)
   dex move 2 4                  move slide 2 to position 4 in ./slides.md
   dex move 3 1 acme/            move slide 3 to the front in acme/slides.md
+  dex rename "New Title"           rename the deck title in frontmatter
+  dex rename "New Title" acme/     rename deck in acme/slides.md
+  dex rename-slide 3 "New Title"   rename slide 3
+  dex rename-slide acme/3 "Hi"    rename slide 3 in acme/slides.md
+  dex rename-slide 1,3 "Same"     rename slides 1 and 3
   dex new "My Talk"             scaffold my-talk/`),
 		kong.UsageOnError(),
 	)

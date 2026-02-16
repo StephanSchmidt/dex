@@ -8,6 +8,8 @@ A CLI tool for manipulating [Slidev](https://sli.dev) markdown presentations.
 - **slide** — print raw slide markdown
 - **copy** — copy slides between decks
 - **move** — reorder slides within a deck
+- **rename** — rename the deck title in frontmatter
+- **rename-slide** — rename a slide's title
 - **new** — scaffold a new presentation directory
 
 ## Installation
@@ -40,6 +42,11 @@ dex slides acme/            # list slides in acme/slides.md
 dex slide 3                 # print raw markdown of slide 3
 dex copy dir1/1-3 dir2/5    # copy slides 1-3 from dir1, insert before slide 5 in dir2
 dex move 2 4                # move slide 2 to position 4
+dex rename "New Title"          # rename the deck title in frontmatter
+dex rename "New Title" acme/    # rename deck in acme/slides.md
+dex rename-slide 3 "New Title"  # rename slide 3
+dex rename-slide acme/3 "Hi"   # rename slide 3 in acme/slides.md
+dex rename-slide 1,3 "Same"   # rename slides 1 and 3
 dex new "My Talk"           # scaffold my-talk/
 ```
 
