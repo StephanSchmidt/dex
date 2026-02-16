@@ -4,13 +4,15 @@ A CLI tool for manipulating [Slidev](https://sli.dev) markdown presentations.
 
 ## Features
 
-- **slides** — list slide numbers and titles
-- **slide** — print raw slide markdown
-- **copy** — copy slides between decks
-- **move** — reorder slides within a deck
-- **rename** — rename the deck title in frontmatter
-- **rename-slide** — rename a slide's title
-- **new** — scaffold a new presentation directory
+| Command | Description |
+|---------|-------------|
+| `slides` | List slide numbers and titles |
+| `slide` | Print raw slide markdown |
+| `copy` | Copy slides between decks |
+| `move` | Reorder slides within a deck |
+| `rename` | Rename the deck title in frontmatter |
+| `rename-slide` | Rename a slide's title |
+| `new` | Scaffold a new presentation directory |
 
 ## Installation
 
