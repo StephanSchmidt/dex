@@ -19,10 +19,11 @@ var cli struct {
 	Delete      DeleteCmd      `cmd:"" help:"Delete one or more slides from a deck."`
 	Insert      InsertCmd      `cmd:"" help:"Insert a new blank slide with the given title at a position."`
 	Move        MoveCmd        `cmd:"" help:"Move a slide to a different position within one deck file."`
-	Rename      RenameCmd      `cmd:"" help:"Rename the deck title in frontmatter."`
+	Rename      RenameCmd      `cmd:"" help:"Rename the deck title in metadata."`
 	RenameSlide RenameSlideCmd `cmd:"rename-slide" help:"Rename a slide's title."`
-	Slide       SlideCmd       `cmd:"" help:"Print raw slide markdown to stdout (read-only)."`
+	Slide       SlideCmd       `cmd:"" help:"Print raw slide content to stdout (read-only)."`
 	Slides      SlidesCmd      `cmd:"" help:"List slide numbers and titles to stdout (read-only)."`
+	Swap        SwapCmd        `cmd:"" help:"Swap two slides (same or different decks)."`
 }
 
 func main() {
@@ -55,12 +56,16 @@ Examples:
   dex insert 3 "New Slide"      insert a new slide before slide 3
   dex insert acme/2 "Intro"     insert a new slide at position 2 in acme/
   dex move 2 4                  move slide 2 to position 4
+  dex move 2 +1                 move slide 2 down by one position
+  dex move 4 -2                 move slide 4 up by two positions
   dex move 3 1 acme/            move slide 3 to the front in acme/
   dex rename "New Title"           rename the deck title
   dex rename "New Title" acme/     rename deck in acme/
   dex rename-slide 3 "New Title"   rename slide 3
   dex rename-slide acme/3 "Hi"    rename slide 3 in acme/
   dex rename-slide 1,3 "Same"     rename slides 1 and 3
+  dex swap 1 3                  swap slides 1 and 3
+  dex swap acme/2 other/1       swap slide 2 in acme/ with slide 1 in other/
   dex new "My Talk"             scaffold my-talk/ (Slidev)
   dex new --format revealjs "My Talk"  scaffold my-talk/ (reveal.js)`),
 		kong.UsageOnError(),

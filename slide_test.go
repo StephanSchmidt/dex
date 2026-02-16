@@ -17,7 +17,7 @@ func TestSlide(t *testing.T) {
 			t.Errorf("expected slide A, got:\n%s", out)
 		}
 		if strings.Contains(out, "theme: default") {
-			t.Errorf("should not contain document frontmatter, got:\n%s", out)
+			t.Errorf("should not contain document metadata, got:\n%s", out)
 		}
 	})
 
@@ -35,7 +35,7 @@ func TestSlide(t *testing.T) {
 			t.Errorf("expected slide C, got:\n%s", out)
 		}
 		if !strings.Contains(out, "layout: center") {
-			t.Errorf("expected per-slide frontmatter for C, got:\n%s", out)
+			t.Errorf("expected per-slide metadata for C, got:\n%s", out)
 		}
 	})
 
