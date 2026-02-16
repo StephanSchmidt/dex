@@ -19,6 +19,7 @@ var cli struct {
 	Delete      DeleteCmd      `cmd:"" help:"Delete one or more slides from a deck."`
 	Insert      InsertCmd      `cmd:"" help:"Insert a new blank slide with the given title at a position."`
 	Move        MoveCmd        `cmd:"" help:"Move a slide to a different position within one deck file."`
+	UI          UICmd          `cmd:"" help:"Interactive TUI for reordering slides."`
 	Rename      RenameCmd      `cmd:"" help:"Rename the deck title in metadata."`
 	RenameSlide RenameSlideCmd `cmd:"rename-slide" help:"Rename a slide's title."`
 	Slide       SlideCmd       `cmd:"" help:"Print raw slide content to stdout (read-only)."`
@@ -59,6 +60,8 @@ Examples:
   dex move 2 +1                 move slide 2 down by one position
   dex move 4 -2                 move slide 4 up by two positions
   dex move 3 1 acme/            move slide 3 to the front in acme/
+  dex ui                        interactive slide reordering
+  dex ui acme/                  reorder slides in acme/
   dex rename "New Title"           rename the deck title
   dex rename "New Title" acme/     rename deck in acme/
   dex rename-slide 3 "New Title"   rename slide 3

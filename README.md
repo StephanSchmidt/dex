@@ -15,6 +15,7 @@ A CLI tool for manipulating slide presentations ([Slidev](https://sli.dev) markd
 | `rename` | Rename the deck title | `dex rename "New Title"` |
 | `rename-slide` | Rename a slide's title | `dex rename-slide 3 "Hi"` |
 | `swap` | Swap two slides (same or different decks) | `dex swap 1 3` |
+| `ui` | Interactive TUI for reordering slides (lipgloss styled) | `dex ui` |
 | `new` | Scaffold a new presentation directory | `dex new "My Talk"` |
 
 ## Installation
@@ -61,6 +62,8 @@ dex rename-slide acme/3 "Hi"   # rename slide 3 in acme/slides.md
 dex rename-slide 1,3 "Same"   # rename slides 1 and 3
 dex swap 1 3                # swap slides 1 and 3
 dex swap acme/2 other/1     # swap across decks
+dex ui                      # interactive slide reordering (styled TUI)
+dex ui acme/                # reorder slides in acme/
 dex new "My Talk"           # scaffold my-talk/
 ```
 
