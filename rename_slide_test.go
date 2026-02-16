@@ -53,8 +53,8 @@ func TestRenameSlide(t *testing.T) {
 			t.Fatalf("Run() error: %v", err)
 		}
 		data, _ := afero.ReadFile(appFs, "slides.md")
-		d := parseDeck(data)
-		if d.slides[2].frontmatter == "" {
+		d := activeFormat.Parse(data)
+		if d.Slides[2].Frontmatter == "" {
 			t.Error("expected frontmatter on slide 3, got empty")
 		}
 		titles := getTitles(t)

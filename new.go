@@ -40,32 +40,35 @@ func (c *NewCmd) Run() error {
 		return fmt.Errorf("%s already exists", dir)
 	}
 
-	for _, sub := range []string{"public", "snippets"} {
-		if err := appFs.MkdirAll(filepath.Join(dir, sub), 0o755); err != nil {
-			return fmt.Errorf("creating directories: %w", err)
+	for _, sf := range activeFormat.Scaffold(title, slug) {
+		p := filepath.Join(dir, sf.Path)
+		if sf.IsDir {
+			if err := appFs.MkdirAll(p, 0o755); err != nil {
+				return fmt.Errorf("creating %s: %w", p, err)
+			}
+		} else {
+			// Ensure parent directory exists.
+			if err := appFs.MkdirAll(filepath.Dir(p), 0o755); err != nil {
+				return fmt.Errorf("creating %s: %w", filepath.Dir(p), err)
+			}
+			if err := afero.WriteFile(appFs, p, []byte(sf.Content), 0o644); err != nil {
+				return fmt.Errorf("writing %s: %w", p, err)
+			}
 		}
 	}
 
-	pkgJSON := fmt.Sprintf(packageJSONTemplate, slug)
-	if err := afero.WriteFile(appFs, filepath.Join(dir, "package.json"), []byte(pkgJSON), 0o644); err != nil {
-		return fmt.Errorf("writing package.json: %w", err)
-	}
-
-	slidesMD := fmt.Sprintf(slidesMDTemplate, title, title)
-	if err := afero.WriteFile(appFs, filepath.Join(dir, "slides.md"), []byte(slidesMD), 0o644); err != nil {
-		return fmt.Errorf("writing slides.md: %w", err)
-	}
-
-	fmt.Fprintln(stdout, "Running pnpm install...")
-	cmd := exec.Command("pnpm", "install")
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("running pnpm install: %w", err)
+	if args := activeFormat.PostScaffoldCmd(); len(args) > 0 {
+		fmt.Fprintf(stdout, "Running %s...\n", strings.Join(args, " "))
+		cmd := exec.Command(args[0], args[1:]...) // #nosec G204 -- args from trusted format
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		if err := cmd.Run(); err != nil {
+			return fmt.Errorf("running %s: %w", strings.Join(args, " "), err)
+		}
 	}
 
 	fmt.Fprintln(stdout)
-	fmt.Fprintf(stdout, "Created %s\n", dir)   // #nosec G705 -- CLI output, not web
+	fmt.Fprintf(stdout, "Created %s\n", dir)             // #nosec G705 -- CLI output, not web
 	fmt.Fprintf(stdout, "Run: make dev PRES=%s\n", slug) // #nosec G705 -- CLI output, not web
 	return nil
 }
@@ -81,33 +84,3 @@ func slugify(title string) string {
 	}
 	return b.String()
 }
-
-const packageJSONTemplate = `{
-  "name": "presentation-%s",
-  "type": "module",
-  "private": true,
-  "scripts": {
-    "build": "slidev build",
-    "dev": "slidev --open",
-    "export": "slidev export"
-  },
-  "dependencies": {
-    "@slidev/cli": "^52.11.5",
-    "@slidev/theme-default": "latest",
-    "@slidev/theme-seriph": "latest"
-  },
-  "devDependencies": {
-    "playwright-chromium": "^1.58.1"
-  }
-}
-`
-
-const slidesMDTemplate = `---
-theme: default
-title: %s
-class: text-center
----
-
-# %s
-
-`

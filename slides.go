@@ -20,16 +20,16 @@ func (c *SlidesCmd) Run() error {
 		}
 
 		if rangeExpr == "" {
-			for i, s := range d.slides {
-				fmt.Fprintf(stdout, "%3d  %s\n", i+1, extractTitle(s.content))
+			for i, s := range d.Slides {
+				fmt.Fprintf(stdout, "%3d  %s\n", i+1, activeFormat.ExtractTitle(s.Content))
 			}
 		} else {
-			indices, err := parseSliceExpr(rangeExpr, len(d.slides))
+			indices, err := parseSliceExpr(rangeExpr, len(d.Slides))
 			if err != nil {
 				return fmt.Errorf("%s: %w", expr, err)
 			}
 			for _, idx := range indices {
-				fmt.Fprintf(stdout, "%3d  %s\n", idx+1, extractTitle(d.slides[idx].content))
+				fmt.Fprintf(stdout, "%3d  %s\n", idx+1, activeFormat.ExtractTitle(d.Slides[idx].Content))
 			}
 		}
 	}

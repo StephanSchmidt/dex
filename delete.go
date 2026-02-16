@@ -13,7 +13,7 @@ func (c *DeleteCmd) Run() error {
 		return err
 	}
 
-	indices, err := parseSliceExpr(rangeExpr, len(d.slides))
+	indices, err := parseSliceExpr(rangeExpr, len(d.Slides))
 	if err != nil {
 		return fmt.Errorf("%s: %w", c.Expr, err)
 	}
@@ -23,17 +23,17 @@ func (c *DeleteCmd) Run() error {
 		remove[i] = true
 	}
 
-	if len(remove) >= len(d.slides) {
-		return fmt.Errorf("cannot delete all %d slides", len(d.slides))
+	if len(remove) >= len(d.Slides) {
+		return fmt.Errorf("cannot delete all %d slides", len(d.Slides))
 	}
 
-	kept := make([]slide, 0, len(d.slides)-len(remove))
-	for i, s := range d.slides {
+	kept := make([]slide, 0, len(d.Slides)-len(remove))
+	for i, s := range d.Slides {
 		if !remove[i] {
 			kept = append(kept, s)
 		}
 	}
-	d.slides = kept
+	d.Slides = kept
 
 	return writeDeck(file, d)
 }

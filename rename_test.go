@@ -15,8 +15,8 @@ func TestRename(t *testing.T) {
 			t.Fatalf("Run() error: %v", err)
 		}
 		data, _ := afero.ReadFile(appFs, "slides.md")
-		d := parseDeck(data)
-		if got := extractFrontmatterTitle(d.frontmatter); got != "New Deck" {
+		d := activeFormat.Parse(data)
+		if got := extractFrontmatterTitle(d.Frontmatter); got != "New Deck" {
 			t.Errorf("got %q, want %q", got, "New Deck")
 		}
 		// Slides must be untouched.
@@ -35,8 +35,8 @@ func TestRename(t *testing.T) {
 			t.Fatalf("Run() error: %v", err)
 		}
 		data, _ := afero.ReadFile(appFs, "slides.md")
-		d := parseDeck(data)
-		if got := extractFrontmatterTitle(d.frontmatter); got != "Added" {
+		d := activeFormat.Parse(data)
+		if got := extractFrontmatterTitle(d.Frontmatter); got != "Added" {
 			t.Errorf("got %q, want %q", got, "Added")
 		}
 	})
@@ -50,8 +50,8 @@ func TestRename(t *testing.T) {
 			t.Fatalf("Run() error: %v", err)
 		}
 		data, _ := afero.ReadFile(appFs, "mydir/slides.md")
-		d := parseDeck(data)
-		if got := extractFrontmatterTitle(d.frontmatter); got != "Dir Deck" {
+		d := activeFormat.Parse(data)
+		if got := extractFrontmatterTitle(d.Frontmatter); got != "Dir Deck" {
 			t.Errorf("got %q, want %q", got, "Dir Deck")
 		}
 	})
@@ -63,11 +63,11 @@ func TestRename(t *testing.T) {
 			t.Fatalf("Run() error: %v", err)
 		}
 		data, _ := afero.ReadFile(appFs, "slides.md")
-		d := parseDeck(data)
-		if got := extractFrontmatterTitle(d.frontmatter); got != "Renamed" {
+		d := activeFormat.Parse(data)
+		if got := extractFrontmatterTitle(d.Frontmatter); got != "Renamed" {
 			t.Errorf("title: got %q, want %q", got, "Renamed")
 		}
-		if got := extractFrontmatterField(d.frontmatter, "theme"); got != "default" {
+		if got := extractFrontmatterField(d.Frontmatter, "theme"); got != "default" {
 			t.Errorf("theme: got %q, want %q", got, "default")
 		}
 	})

@@ -72,10 +72,10 @@ func getTitlesFrom(t *testing.T, file string) []string {
 	if err != nil {
 		t.Fatalf("reading %s: %v", file, err)
 	}
-	d := parseDeck(data)
+	d := activeFormat.Parse(data)
 	var titles []string
-	for _, s := range d.slides {
-		titles = append(titles, extractTitle(s.content))
+	for _, s := range d.Slides {
+		titles = append(titles, activeFormat.ExtractTitle(s.Content))
 	}
 	return titles
 }

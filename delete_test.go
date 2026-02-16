@@ -54,9 +54,9 @@ func TestDelete(t *testing.T) {
 			t.Fatalf("Run() error: %v", err)
 		}
 		data, _ := afero.ReadFile(appFs, "slides.md")
-		d := parseDeck(data)
+		d := activeFormat.Parse(data)
 		// After deleting B (index 1), C moves to index 1.
-		if d.slides[1].frontmatter == "" {
+		if d.Slides[1].Frontmatter == "" {
 			t.Error("expected frontmatter on slide C, got empty")
 		}
 	})

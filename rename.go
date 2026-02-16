@@ -1,10 +1,8 @@
 package main
 
-import "strings"
-
 type RenameCmd struct {
 	Name string `arg:"" help:"New title for the deck."`
-	File string `arg:"" optional:"" default:"slides.md" help:"Path to slides.md file or its parent directory."`
+	File string `arg:"" optional:"" default:"" help:"Path to slides file or its parent directory."`
 }
 
 func (c *RenameCmd) Run() error {
@@ -13,20 +11,7 @@ func (c *RenameCmd) Run() error {
 		return err
 	}
 
-	lines := strings.Split(d.frontmatter, "\n")
-	replaced := false
-	for i, line := range lines {
-		if strings.HasPrefix(line, "title:") {
-			lines[i] = "title: " + c.Name
-			replaced = true
-			break
-		}
-	}
-	if replaced {
-		d.frontmatter = strings.Join(lines, "\n")
-	} else {
-		d.frontmatter += "title: " + c.Name + "\n"
-	}
+	d = activeFormat.RenameDeck(d, c.Name)
 
 	return writeDeck(file, d)
 }

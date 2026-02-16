@@ -17,7 +17,7 @@ func (c *CopyCmd) Run() error {
 	if err != nil {
 		return err
 	}
-	indices, err := parseSliceExpr(srcRange, len(src.slides))
+	indices, err := parseSliceExpr(srcRange, len(src.Slides))
 	if err != nil {
 		return fmt.Errorf("%s: %w", c.Source, err)
 	}
@@ -25,7 +25,7 @@ func (c *CopyCmd) Run() error {
 	// Collect source slides before touching the target.
 	copied := make([]slide, len(indices))
 	for i, idx := range indices {
-		copied[i] = src.slides[idx]
+		copied[i] = src.Slides[idx]
 	}
 
 	// Parse target.
@@ -39,9 +39,9 @@ func (c *CopyCmd) Run() error {
 	if err != nil {
 		return fmt.Errorf("invalid target position %q: %w", posStr, err)
 	}
-	if pos < 1 || pos > len(tgt.slides)+1 {
-		return fmt.Errorf("target position %d out of range (1..%d)", pos, len(tgt.slides)+1)
+	if pos < 1 || pos > len(tgt.Slides)+1 {
+		return fmt.Errorf("target position %d out of range (1..%d)", pos, len(tgt.Slides)+1)
 	}
 
-	return writeDeck(tgtFile, tgt.insert(pos-1, copied))
+	return writeDeck(tgtFile, tgt.Insert(pos-1, copied))
 }

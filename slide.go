@@ -14,19 +14,13 @@ func (c *SlideCmd) Run() error {
 			return err
 		}
 
-		indices, err := parseSliceExpr(rangeExpr, len(d.slides))
+		indices, err := parseSliceExpr(rangeExpr, len(d.Slides))
 		if err != nil {
 			return fmt.Errorf("%s: %w", expr, err)
 		}
 
 		for _, idx := range indices {
-			s := d.slides[idx]
-			fmt.Fprint(stdout, "---\n")
-			if s.frontmatter != "" {
-				fmt.Fprint(stdout, s.frontmatter)
-				fmt.Fprint(stdout, "---\n")
-			}
-			fmt.Fprint(stdout, s.content)
+			fmt.Fprint(stdout, activeFormat.RenderSlide(d.Slides[idx]))
 		}
 	}
 	return nil

@@ -116,8 +116,8 @@ func TestInsert(t *testing.T) {
 		if err != nil {
 			t.Fatalf("reading slides.md: %v", err)
 		}
-		d := parseDeck(data)
-		if !strings.Contains(d.frontmatter, "title: Test") {
+		d := activeFormat.Parse(data)
+		if !strings.Contains(d.Frontmatter, "title: Test") {
 			t.Error("deck frontmatter not preserved")
 		}
 	})
