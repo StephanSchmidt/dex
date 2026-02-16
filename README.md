@@ -4,15 +4,15 @@ A CLI tool for manipulating [Slidev](https://sli.dev) markdown presentations.
 
 ## Features
 
-| Command | Description |
-|---------|-------------|
-| `slides` | List slide numbers and titles |
-| `slide` | Print raw slide markdown |
-| `copy` | Copy slides between decks |
-| `move` | Reorder slides within a deck |
-| `rename` | Rename the deck title in frontmatter |
-| `rename-slide` | Rename a slide's title |
-| `new` | Scaffold a new presentation directory |
+| Command | Description | Example |
+|---------|-------------|---------|
+| `slides` | List slide numbers and titles | `dex slides acme/` |
+| `slide` | Print raw slide markdown | `dex slide 3` |
+| `copy` | Copy slides between decks | `dex copy dir1/1-3 dir2/5` |
+| `move` | Reorder slides within a deck | `dex move 2 4` |
+| `rename` | Rename the deck title in frontmatter | `dex rename "New Title"` |
+| `rename-slide` | Rename a slide's title | `dex rename-slide 3 "Hi"` |
+| `new` | Scaffold a new presentation directory | `dex new "My Talk"` |
 
 ## Installation
 
