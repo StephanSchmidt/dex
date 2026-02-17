@@ -92,7 +92,7 @@ func newUIModel(slides []slide, metadata, file string) uiModel {
 func (m *uiModel) rebuildTitles() {
 	m.titles = make([]string, len(m.slides))
 	for i, s := range m.slides {
-		m.titles[i] = activeFormat.ExtractTitle(s.Content)
+		m.titles[i] = displayTitle(s)
 	}
 }
 

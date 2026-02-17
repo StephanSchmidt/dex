@@ -131,19 +131,21 @@ func TestRender(t *testing.T) {
 
 func TestExtractTitle(t *testing.T) {
 	tests := []struct {
-		name    string
-		content string
-		want    string
+		name  string
+		slide format.Slide
+		want  string
 	}{
-		{"H1 heading", "\n# Hello World\n\n", "Hello World"},
-		{"title attribute", "\n<div title=\"Slide One\">\ncontent\n</div>\n\n", "Slide One"},
-		{"H1 takes precedence", "\n# Heading\n<div title=\"Attr\">\n</div>\n", "Heading"},
-		{"no title", "\nJust text\n\n", "(untitled)"},
-		{"empty", "", "(untitled)"},
+		{"H1 heading", format.Slide{Content: "\n# Hello World\n\n"}, "Hello World"},
+		{"title attribute", format.Slide{Content: "\n<div title=\"Slide One\">\ncontent\n</div>\n\n"}, "Slide One"},
+		{"H1 takes precedence", format.Slide{Content: "\n# Heading\n<div title=\"Attr\">\n</div>\n"}, "Heading"},
+		{"metadata title", format.Slide{Metadata: "layout: quote\ntitle: From Metadata\n"}, "From Metadata"},
+		{"H1 over metadata", format.Slide{Content: "\n# Heading\n", Metadata: "title: Meta\n"}, "Heading"},
+		{"no title", format.Slide{Content: "\nJust text\n\n"}, "(untitled)"},
+		{"empty", format.Slide{}, "(untitled)"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := f.ExtractTitle(tt.content); got != tt.want {
+			if got := f.ExtractTitle(tt.slide); got != tt.want {
 				t.Errorf("ExtractTitle() = %q, want %q", got, tt.want)
 			}
 		})

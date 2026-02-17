@@ -67,8 +67,8 @@ func (Format) Render(d format.Deck) []byte {
 
 // ExtractTitle returns the title from slide content, looking for h1
 // first, then h2.
-func (Format) ExtractTitle(content string) string {
-	doc, err := goquery.NewDocumentFromReader(strings.NewReader("<div>" + content + "</div>"))
+func (Format) ExtractTitle(s format.Slide) string {
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader("<div>" + s.Content + "</div>"))
 	if err != nil {
 		return "(untitled)"
 	}

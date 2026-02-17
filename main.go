@@ -18,16 +18,16 @@ var cli struct {
 	Format      string           `help:"Presentation format (slidev, revealjs). Auto-detected from file extension if omitted." enum:"slidev,revealjs," default:""`
 	Version     kong.VersionFlag `help:"Print version and exit." short:"v"`
 	New         NewCmd           `cmd:"" help:"Scaffold a new presentation directory."`
-	Copy        CopyCmd        `cmd:"" help:"Copy slides from source deck into target deck before a given position. Source is unchanged."`
-	Delete      DeleteCmd      `cmd:"" help:"Delete one or more slides from a deck."`
-	Insert      InsertCmd      `cmd:"" help:"Insert a new blank slide with the given title at a position."`
-	Move        MoveCmd        `cmd:"" help:"Move a slide to a different position within one deck file."`
-	UI          UICmd          `cmd:"" help:"Interactive TUI for reordering slides."`
-	Rename      RenameCmd      `cmd:"" help:"Rename the deck title in metadata."`
-	RenameSlide RenameSlideCmd `cmd:"rename-slide" help:"Rename a slide's title."`
-	Slide       SlideCmd       `cmd:"" help:"Print raw slide content to stdout (read-only)."`
-	Slides      SlidesCmd      `cmd:"" help:"List slide numbers and titles to stdout (read-only)."`
-	Swap        SwapCmd        `cmd:"" help:"Swap two slides (same or different decks)."`
+	Copy        CopyCmd          `cmd:"" help:"Copy slides from source deck into target deck before a given position. Source is unchanged."`
+	Delete      DeleteCmd        `cmd:"" help:"Delete one or more slides from a deck."`
+	Insert      InsertCmd        `cmd:"" help:"Insert a new blank slide with the given title at a position."`
+	Move        MoveCmd          `cmd:"" help:"Move a slide to a different position within one deck file."`
+	UI          UICmd            `cmd:"" help:"Interactive TUI for reordering slides."`
+	Rename      RenameCmd        `cmd:"" help:"Rename the deck title in metadata."`
+	RenameSlide RenameSlideCmd   `cmd:"rename-slide" help:"Rename a slide's title."`
+	Slide       SlideCmd         `cmd:"" help:"Print raw slide content to stdout (read-only)."`
+	Slides      SlidesCmd        `cmd:"" help:"List slide numbers and titles to stdout (read-only)."`
+	Swap        SwapCmd          `cmd:"" help:"Swap two slides (same or different decks)."`
 }
 
 func main() {

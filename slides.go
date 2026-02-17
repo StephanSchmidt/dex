@@ -21,7 +21,7 @@ func (c *SlidesCmd) Run() error {
 
 		if rangeExpr == "" {
 			for i, s := range d.Slides {
-				fmt.Fprintf(stdout, "%3d  %s\n", i+1, activeFormat.ExtractTitle(s.Content))
+				fmt.Fprintf(stdout, "%3d  %s\n", i+1, displayTitle(s))
 			}
 		} else {
 			indices, err := parseSliceExpr(rangeExpr, len(d.Slides))
@@ -29,7 +29,7 @@ func (c *SlidesCmd) Run() error {
 				return fmt.Errorf("%s: %w", expr, err)
 			}
 			for _, idx := range indices {
-				fmt.Fprintf(stdout, "%3d  %s\n", idx+1, activeFormat.ExtractTitle(d.Slides[idx].Content))
+				fmt.Fprintf(stdout, "%3d  %s\n", idx+1, displayTitle(d.Slides[idx]))
 			}
 		}
 	}

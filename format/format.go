@@ -32,7 +32,7 @@ type ScaffoldFile struct {
 type Format interface {
 	Parse(data []byte) Deck
 	Render(d Deck) []byte
-	ExtractTitle(content string) string
+	ExtractTitle(s Slide) string
 	DefaultFile() string
 	RenderSlide(s Slide) string
 	RenameSlide(s Slide, name string) Slide

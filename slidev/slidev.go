@@ -79,18 +79,23 @@ func (Format) Render(d format.Deck) []byte {
 	return []byte(buf.String())
 }
 
-// ExtractTitle returns the title from slide content, looking for H1
-// headings first, then title attributes.
-func (Format) ExtractTitle(content string) string {
-	for line := range strings.SplitSeq(content, "\n") {
+var metaTitleRe = regexp.MustCompile(`(?m)^title:\s*(.+)`)
+
+// ExtractTitle returns the title from a slide, looking for H1 headings
+// first, then title attributes in content, then title: in metadata.
+func (Format) ExtractTitle(s format.Slide) string {
+	for line := range strings.SplitSeq(s.Content, "\n") {
 		if m := headingRe.FindStringSubmatch(line); m != nil {
 			return m[1]
 		}
 	}
-	for line := range strings.SplitSeq(content, "\n") {
+	for line := range strings.SplitSeq(s.Content, "\n") {
 		if m := titleAttrRe.FindStringSubmatch(line); m != nil {
 			return m[1]
 		}
+	}
+	if m := metaTitleRe.FindStringSubmatch(s.Metadata); m != nil {
+		return strings.TrimSpace(m[1])
 	}
 	return "(untitled)"
 }

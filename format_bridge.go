@@ -64,6 +64,15 @@ func readDeck(dirOrFile string) (deck, string, error) {
 	return activeFormat.Parse(data), file, nil
 }
 
+// displayTitle returns the slide title, prefixed with "> " for detail slides.
+func displayTitle(s slide) string {
+	title := activeFormat.ExtractTitle(s)
+	if strings.Contains(s.Metadata, "nav: detail") {
+		return "> " + title
+	}
+	return title
+}
+
 // writeDeck renders a deck and writes it to the given file.
 func writeDeck(file string, d deck) error {
 	if err := afero.WriteFile(appFs, file, activeFormat.Render(d), 0o644); err != nil {

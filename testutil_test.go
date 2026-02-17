@@ -75,7 +75,7 @@ func getTitlesFrom(t *testing.T, file string) []string {
 	d := activeFormat.Parse(data)
 	var titles []string
 	for _, s := range d.Slides {
-		titles = append(titles, activeFormat.ExtractTitle(s.Content))
+		titles = append(titles, activeFormat.ExtractTitle(s))
 	}
 	return titles
 }
