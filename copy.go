@@ -1,13 +1,10 @@
 package main
 
-import (
-	"fmt"
-	"strconv"
-)
+import "fmt"
 
 type CopyCmd struct {
 	Source string `arg:"" help:"Source slides as [dir/]range (e.g. dir1/1-3, 2,4)."`
-	Target string `arg:"" help:"Insert before this position in target deck as [dir/]N (1-based, N+1 appends). E.g. dir2/5, 3."`
+	Target string `arg:"" help:"Insert before this position in target deck as [dir/]N (1-based, N+1 appends, -1 appends). E.g. dir2/5, -1, 3."`
 }
 
 func (c *CopyCmd) Run() error {
@@ -35,13 +32,10 @@ func (c *CopyCmd) Run() error {
 		return err
 	}
 
-	pos, err := strconv.Atoi(posStr)
+	idx, err := resolveInsertIndex(posStr, len(tgt.Slides))
 	if err != nil {
 		return fmt.Errorf("invalid target position %q: %w", posStr, err)
 	}
-	if pos < 1 || pos > len(tgt.Slides)+1 {
-		return fmt.Errorf("target position %d out of range (1..%d)", pos, len(tgt.Slides)+1)
-	}
 
-	return writeDeck(tgtFile, tgt.Insert(pos-1, copied))
+	return writeDeck(tgtFile, tgt.Insert(idx, copied))
 }

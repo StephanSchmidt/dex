@@ -72,6 +72,14 @@ func parseSliceExpr(expr string, length int) ([]int, error) {
 	return result, nil
 }
 
+// resolveInsertIndex converts a 1-based (possibly negative) position string
+// to a 0-based insertion index. Valid positions are 1..n+1 (where n is the
+// number of slides), with n+1 meaning "append". Negative values count from
+// the end: -1 = append, -2 = before last slide, etc.
+func resolveInsertIndex(s string, nSlides int) (int, error) {
+	return resolveIndex(s, nSlides+1)
+}
+
 // resolveIndex converts a 1-based (possibly negative) index string to a
 // 0-based index. Negative values count from the end (-1 = last).
 func resolveIndex(s string, length int) (int, error) {

@@ -137,3 +137,37 @@ func TestParseSliceExpr(t *testing.T) {
 		})
 	}
 }
+
+func TestResolveInsertIndex(t *testing.T) {
+	// 4 slides → valid 1-based positions: 1,2,3,4,5 (5 = append)
+	tests := []struct {
+		name    string
+		expr    string
+		nSlides int
+		want    int
+		wantErr bool
+	}{
+		{name: "first", expr: "1", nSlides: 4, want: 0},
+		{name: "append", expr: "5", nSlides: 4, want: 4},
+		{name: "middle", expr: "3", nSlides: 4, want: 2},
+		{name: "neg -1 appends", expr: "-1", nSlides: 4, want: 4},
+		{name: "neg -2 before last", expr: "-2", nSlides: 4, want: 3},
+		{name: "neg -5 first", expr: "-5", nSlides: 4, want: 0},
+		{name: "error: zero", expr: "0", nSlides: 4, wantErr: true},
+		{name: "error: too high", expr: "6", nSlides: 4, wantErr: true},
+		{name: "error: too negative", expr: "-6", nSlides: 4, wantErr: true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := resolveInsertIndex(tt.expr, tt.nSlides)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("resolveInsertIndex(%q, %d) error = %v, wantErr %v", tt.expr, tt.nSlides, err, tt.wantErr)
+				return
+			}
+			if err == nil && got != tt.want {
+				t.Errorf("resolveInsertIndex(%q, %d) = %d, want %d", tt.expr, tt.nSlides, got, tt.want)
+			}
+		})
+	}
+}

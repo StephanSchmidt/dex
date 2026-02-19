@@ -7,7 +7,7 @@ import (
 )
 
 type MoveCmd struct {
-	From int    `arg:"" help:"1-based slide number to move."`
+	From string `arg:"" help:"1-based slide number to move (negative counts from end, e.g. -1 = last)."`
 	To   string `arg:"" help:"1-based target position, or +N/-N relative offset (e.g. +1, -2)."`
 	File string `arg:"" optional:"" default:"" help:"Path to slides file or its parent directory."`
 }
@@ -19,11 +19,13 @@ func (c *MoveCmd) Run() error {
 	}
 
 	n := len(d.Slides)
-	if c.From < 1 || c.From > n {
-		return fmt.Errorf("from index %d out of range (1..%d)", c.From, n)
+	fromIdx, err := resolveIndex(c.From, n)
+	if err != nil {
+		return fmt.Errorf("from: %w", err)
 	}
+	fromPos := fromIdx + 1 // 1-based for parseTarget and error messages
 
-	to, err := parseTarget(c.To, c.From)
+	to, err := parseTarget(c.To, fromPos)
 	if err != nil {
 		return err
 	}
@@ -31,11 +33,11 @@ func (c *MoveCmd) Run() error {
 	if to < 1 || to > n {
 		return fmt.Errorf("to index %d out of range (1..%d)", to, n)
 	}
-	if c.From == to {
-		return fmt.Errorf("from and to are the same (%d)", c.From)
+	if fromPos == to {
+		return fmt.Errorf("from and to are the same (%d)", fromPos)
 	}
 
-	from := c.From - 1
+	from := fromIdx
 	toIdx := to - 1
 
 	// Remove slide at from.

@@ -69,6 +69,36 @@ func TestInsert(t *testing.T) {
 		}
 	})
 
+	t.Run("insert at end with -1", func(t *testing.T) {
+		setupTestFs(t, testFixture)
+
+		cmd := InsertCmd{Pos: "-1", Title: "Last"}
+		if err := cmd.Run(); err != nil {
+			t.Fatalf("InsertCmd.Run() error: %v", err)
+		}
+
+		got := getTitles(t)
+		want := []string{"A", "B", "C", "D", "Last"}
+		if !equal(got, want) {
+			t.Errorf("got %v, want %v", got, want)
+		}
+	})
+
+	t.Run("insert before last with -2", func(t *testing.T) {
+		setupTestFs(t, testFixture)
+
+		cmd := InsertCmd{Pos: "-2", Title: "BeforeLast"}
+		if err := cmd.Run(); err != nil {
+			t.Fatalf("InsertCmd.Run() error: %v", err)
+		}
+
+		got := getTitles(t)
+		want := []string{"A", "B", "C", "BeforeLast", "D"}
+		if !equal(got, want) {
+			t.Errorf("got %v, want %v", got, want)
+		}
+	})
+
 	t.Run("error: position 0", func(t *testing.T) {
 		setupTestFs(t, testFixture)
 

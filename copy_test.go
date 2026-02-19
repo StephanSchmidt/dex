@@ -85,6 +85,39 @@ func TestCopy(t *testing.T) {
 		}
 	})
 
+	t.Run("copy to end with -1", func(t *testing.T) {
+		setupTestFs(t, testFixture)
+		writeTestFile(t, "dir1/slides.md", testFixture)
+		writeTestFile(t, "dir2/slides.md", testFixture2)
+
+		cmd := CopyCmd{Source: "dir1/1", Target: "dir2/-1"}
+		if err := cmd.Run(); err != nil {
+			t.Fatalf("CopyCmd.Run() error: %v", err)
+		}
+
+		got := getTitlesFrom(t, "dir2/slides.md")
+		want := []string{"X", "Y", "Z", "A"}
+		if !equal(got, want) {
+			t.Errorf("got %v, want %v", got, want)
+		}
+	})
+
+	t.Run("copy before last with -2", func(t *testing.T) {
+		setupTestFs(t, testFixture)
+		writeTestFile(t, "dir2/slides.md", testFixture2)
+
+		cmd := CopyCmd{Source: "1", Target: "dir2/-2"}
+		if err := cmd.Run(); err != nil {
+			t.Fatalf("CopyCmd.Run() error: %v", err)
+		}
+
+		got := getTitlesFrom(t, "dir2/slides.md")
+		want := []string{"X", "Y", "A", "Z"}
+		if !equal(got, want) {
+			t.Errorf("got %v, want %v", got, want)
+		}
+	})
+
 	t.Run("error: position 0", func(t *testing.T) {
 		setupTestFs(t, testFixture)
 

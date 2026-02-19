@@ -10,8 +10,8 @@ A CLI tool for manipulating slide presentations ([Slidev](https://sli.dev) markd
 | `slide` | Print raw slide content | `dex slide 3` |
 | `copy` | Copy slides between decks | `dex copy dir1/1-3 dir2/5` |
 | `delete` | Delete slides from a deck | `dex delete 3` |
-| `insert` | Insert a new blank slide at a position | `dex insert 3 "New Slide"` |
-| `move` | Reorder slides within a deck | `dex move 2 4`, `dex move 2 +1` |
+| `insert` | Insert a new blank slide at a position | `dex insert 3 "New Slide"`, `dex insert -1 "End"` |
+| `move` | Reorder slides within a deck | `dex move 2 4`, `dex move -1 1` |
 | `rename` | Rename the deck title | `dex rename "New Title"` |
 | `rename-slide` | Rename a slide's title | `dex rename-slide 3 "Hi"` |
 | `swap` | Swap two slides (same or different decks) | `dex swap 1 3` |
@@ -46,9 +46,12 @@ The format is auto-detected from the file extension; use `--format` to override.
 1-3          slides 1 through 3
 1,2,7        specific slides
 -1           last slide
+-2           second-to-last slide
 1:-1         all slides
 dir/1-3      slides 1-3 from dir/slides.md
 ```
+
+Negative positions work everywhere — for insert/copy targets, `-1` means append at the end, `-2` means before the last slide, etc.
 
 ### Examples
 
@@ -60,8 +63,10 @@ dex copy dir1/1-3 dir2/5    # copy slides 1-3 from dir1, insert before slide 5 i
 dex delete 3                # delete slide 3
 dex delete acme/1,3         # delete slides 1 and 3 from acme/
 dex insert 3 "New Slide"    # insert a new slide before slide 3
+dex insert -1 "End"         # append a new slide at the end
 dex insert acme/2 "Intro"   # insert at position 2 in acme/
 dex move 2 4                # move slide 2 to position 4
+dex move -1 1               # move last slide to the front
 dex move 2 +1               # move slide 2 down by one position
 dex move 4 -2               # move slide 4 up by two positions
 dex rename "New Title"          # rename the deck title in metadata
