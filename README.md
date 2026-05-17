@@ -76,7 +76,7 @@ dex move 2 +1               # move slide 2 down by one position
 dex move 4 -2               # move slide 4 up by two positions
 dex move 1 end              # move slide 1 to the back
 dex move 1 end-1            # move slide 1 to second-from-last
-dex move 1:end              # combined from:to form (also lets you write 1:-1)
+dex move 1:end              # combined from:to form (use this when the to position would otherwise look like a flag, e.g. 4:-2)
 dex rename "New Title"          # rename the deck title in metadata
 dex rename "New Title" acme/    # rename deck in acme/slides.md
 dex rename-slide 3 "New Title"  # rename slide 3

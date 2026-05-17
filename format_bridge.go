@@ -33,18 +33,47 @@ func detectFormat(path string) format.Format {
 }
 
 // resolveFile turns a path into a presentation file path. If the path ends
-// with "/" or points to an existing directory, the default filename is appended.
+// with "/", is empty (implicit current directory), or points to an existing
+// directory, a default filename is appended. When the format was not
+// explicitly chosen via --format, the directory is probed for any registered
+// format's default file so e.g. `dex slides somedir/` works for a reveal.js
+// deck (index.html) without needing --format.
 func resolveFile(path string) string {
-	if path == "" {
-		return activeFormat.DefaultFile()
+	dir := path
+	switch {
+	case dir == "":
+		dir = "."
+	case strings.HasSuffix(dir, "/"):
+		// keep as-is
+	default:
+		info, err := appFs.Stat(dir)
+		if err != nil || !info.IsDir() {
+			return path
+		}
 	}
-	if strings.HasSuffix(path, "/") {
-		return filepath.Join(path, activeFormat.DefaultFile())
+
+	// Probe candidates: active format first, then other registered formats
+	// (unless --format was explicit, in which case stick to active).
+	candidates := []string{activeFormat.DefaultFile()}
+	if !formatExplicit {
+		seen := map[string]bool{candidates[0]: true}
+		for _, f := range formatRegistry {
+			d := f.DefaultFile()
+			if !seen[d] {
+				candidates = append(candidates, d)
+				seen[d] = true
+			}
+		}
 	}
-	if info, err := appFs.Stat(path); err == nil && info.IsDir() {
-		return filepath.Join(path, activeFormat.DefaultFile())
+	for _, name := range candidates {
+		c := filepath.Join(dir, name)
+		if _, err := appFs.Stat(c); err == nil {
+			return c
+		}
 	}
-	return path
+	// Nothing exists; fall back to active format's default so the caller
+	// surfaces a sensible "no such file" error.
+	return filepath.Join(dir, activeFormat.DefaultFile())
 }
 
 // readDeck resolves a directory-or-file path, reads it, and parses it.

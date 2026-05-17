@@ -1,6 +1,51 @@
 package main
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/spf13/afero"
+)
+
+func TestSplitDirRange(t *testing.T) {
+	origFs := appFs
+	t.Cleanup(func() { appFs = origFs })
+	appFs = afero.NewMemMapFs()
+
+	// Set up an existing directory and an existing file so the function's
+	// stat-based branches can be exercised.
+	if err := appFs.MkdirAll("acme", 0o755); err != nil {
+		t.Fatalf("setup: %v", err)
+	}
+	if err := afero.WriteFile(appFs, "deck.md", []byte("---\n"), 0o644); err != nil {
+		t.Fatalf("setup: %v", err)
+	}
+
+	tests := []struct {
+		name      string
+		expr      string
+		wantDir   string
+		wantRange string
+	}{
+		{"existing dir without slash", "acme", "acme/", ""},
+		{"existing dir with slash", "acme/", "acme/", ""},
+		{"existing file", "deck.md", "deck.md", ""},
+		{"no slash falls back to range", "1-3", "", "1-3"},
+		{"slash splits at last", "acme/1-3", "acme/", "1-3"},
+		{"nested slash splits at last", "a/b/c", "a/b/", "c"},
+		{"trailing slash with no match", "missing/", "missing/", ""},
+		{"empty", "", "", ""},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotDir, gotRange := splitDirRange(tt.expr)
+			if gotDir != tt.wantDir || gotRange != tt.wantRange {
+				t.Errorf("splitDirRange(%q) = (%q,%q), want (%q,%q)",
+					tt.expr, gotDir, gotRange, tt.wantDir, tt.wantRange)
+			}
+		})
+	}
+}
 
 func TestParseSliceExpr(t *testing.T) {
 	tests := []struct {
@@ -111,6 +156,30 @@ func TestParseSliceExpr(t *testing.T) {
 			expr:   "1--1",
 			length: 5,
 			want:   []int{0, 1, 2, 3, 4},
+		},
+		{
+			name:    "bad number as range start",
+			expr:    "abc:3",
+			length:  10,
+			wantErr: true,
+		},
+		{
+			name:    "bad number as range end",
+			expr:    "1:xyz",
+			length:  10,
+			wantErr: true,
+		},
+		{
+			name:    "out-of-range start",
+			expr:    "20:25",
+			length:  10,
+			wantErr: true,
+		},
+		{
+			name:   "trailing comma is skipped",
+			expr:   "1,2,",
+			length: 5,
+			want:   []int{0, 1},
 		},
 	}
 

@@ -238,6 +238,7 @@ func TestIsFrontmatter(t *testing.T) {
 		{"html", "<div>\n</div>\n", false},
 		{"plain text", "just some text\n", false},
 		{"multi-line yaml", "layout: center\nclass: text-center\n", true},
+		{"yaml with blank line inside", "layout: center\n\nclass: text-center\n", true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -292,6 +293,27 @@ func TestNewSlide(t *testing.T) {
 	got := f.NewSlide("Hello World")
 	if !strings.Contains(got.Content, "# Hello World") {
 		t.Errorf("expected H1 heading, got %q", got.Content)
+	}
+}
+
+func TestDeckTitle(t *testing.T) {
+	tests := []struct {
+		name string
+		deck format.Deck
+		want string
+	}{
+		{"title from metadata", format.Deck{Metadata: "theme: default\ntitle: My Talk\n"}, "My Talk"},
+		{"title with surrounding whitespace", format.Deck{Metadata: "title:   Spaced   \n"}, "Spaced"},
+		{"no title key", format.Deck{Metadata: "theme: default\n"}, ""},
+		{"empty metadata", format.Deck{}, ""},
+		{"title first line", format.Deck{Metadata: "title: First\ntheme: default\n"}, "First"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := f.DeckTitle(tt.deck); got != tt.want {
+				t.Errorf("DeckTitle() = %q, want %q", got, tt.want)
+			}
+		})
 	}
 }
 

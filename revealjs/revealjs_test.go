@@ -117,6 +117,24 @@ func TestParse(t *testing.T) {
 			t.Fatalf("got %d slides, want 3", got)
 		}
 	})
+
+	t.Run("falls back to .slides when div.slides missing", func(t *testing.T) {
+		// No <div class="slides"> — the container is found by class only.
+		input := `<!doctype html><html><body><section class="slides"><section><h1>X</h1></section><section><h1>Y</h1></section></section></body></html>`
+		d := f.Parse([]byte(input))
+		if got := len(d.Slides); got != 2 {
+			t.Fatalf("got %d slides, want 2", got)
+		}
+	})
+
+	t.Run("non-section children ignored", func(t *testing.T) {
+		// A <div> mixed in with sections should be skipped.
+		input := `<!doctype html><html><body><div class="slides"><section><h1>A</h1></section><div>not a slide</div><section><h1>B</h1></section></div></body></html>`
+		d := f.Parse([]byte(input))
+		if got := len(d.Slides); got != 2 {
+			t.Fatalf("got %d slides, want 2", got)
+		}
+	})
 }
 
 func TestRender(t *testing.T) {
@@ -275,6 +293,27 @@ func TestNewSlide(t *testing.T) {
 	got := f.NewSlide("Hello World")
 	if !strings.Contains(got.Content, "<h1>Hello World</h1>") {
 		t.Errorf("expected h1 heading, got %q", got.Content)
+	}
+}
+
+func TestDeckTitle(t *testing.T) {
+	tests := []struct {
+		name string
+		deck format.Deck
+		want string
+	}{
+		{"title element", format.Deck{Metadata: "<html><head><title>My Talk</title></head><body>" + sentinel + "</body></html>"}, "My Talk"},
+		{"collapses whitespace", format.Deck{Metadata: "<html><head><title>  spaced   out  </title></head><body></body></html>"}, "spaced out"},
+		{"no title element", format.Deck{Metadata: "<html><head></head><body>" + sentinel + "</body></html>"}, ""},
+		{"empty metadata", format.Deck{}, ""},
+		{"first title wins", format.Deck{Metadata: "<html><head><title>First</title><title>Second</title></head><body></body></html>"}, "First"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := f.DeckTitle(tt.deck); got != tt.want {
+				t.Errorf("DeckTitle() = %q, want %q", got, tt.want)
+			}
+		})
 	}
 }
 

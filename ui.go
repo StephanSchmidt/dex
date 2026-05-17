@@ -193,14 +193,20 @@ func (m uiModel) updateSelected(km tea.KeyMsg) (tea.Model, tea.Cmd) {
 		if src != dst {
 			s := m.slides[src]
 			m.slides = append(m.slides[:src], m.slides[src+1:]...)
-			// After removal, clamp insert index to valid range.
-			ins := min(dst, len(m.slides))
+			// Insert "before what the cursor was on" — matches CLI `move`
+			// and UI `c` (copy). When moving forward, the cursor's slide
+			// shifted up by one after removal, so we decrement to keep the
+			// insertion before it.
+			ins := dst
+			if src < dst {
+				ins--
+			}
 			result := make([]slide, 0, len(m.slides)+1)
 			result = append(result, m.slides[:ins]...)
 			result = append(result, s)
 			result = append(result, m.slides[ins:]...)
 			m.slides = result
-			m.cursor = dst
+			m.cursor = ins
 			m.writeback()
 		}
 		m.selected = -1

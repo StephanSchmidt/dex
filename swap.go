@@ -15,6 +15,7 @@ func (c *SwapCmd) Run() error {
 	if err != nil {
 		return err
 	}
+	fmtA := activeFormat
 	idxA, err := parseSliceExpr(rangeA, len(dA.Slides))
 	if err != nil {
 		return fmt.Errorf("%s: %w", c.A, err)
@@ -26,6 +27,10 @@ func (c *SwapCmd) Run() error {
 	dB, fileB, err := readDeck(dirB)
 	if err != nil {
 		return err
+	}
+	fmtB := activeFormat
+	if fmtA != fmtB {
+		return fmt.Errorf("cannot swap across formats: %s is %T but %s is %T", fileA, fmtA, fileB, fmtB)
 	}
 	idxB, err := parseSliceExpr(rangeB, len(dB.Slides))
 	if err != nil {

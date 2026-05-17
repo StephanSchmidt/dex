@@ -10,10 +10,11 @@ type CopyCmd struct {
 func (c *CopyCmd) Run() error {
 	// Parse source.
 	srcDir, srcRange := splitDirRange(c.Source)
-	src, _, err := readDeck(srcDir)
+	src, srcFile, err := readDeck(srcDir)
 	if err != nil {
 		return err
 	}
+	srcFmt := activeFormat
 	indices, err := parseSliceExpr(srcRange, len(src.Slides))
 	if err != nil {
 		return fmt.Errorf("%s: %w", c.Source, err)
@@ -30,6 +31,10 @@ func (c *CopyCmd) Run() error {
 	tgt, tgtFile, err := readDeck(tgtDir)
 	if err != nil {
 		return err
+	}
+	tgtFmt := activeFormat
+	if srcFmt != tgtFmt {
+		return fmt.Errorf("cannot copy across formats: %s is %T but %s is %T", srcFile, srcFmt, tgtFile, tgtFmt)
 	}
 
 	idx, err := resolveInsertIndex(posStr, len(tgt.Slides))

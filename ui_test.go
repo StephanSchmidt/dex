@@ -223,9 +223,34 @@ func TestUISelectMove(t *testing.T) {
 			t.Errorf("selected = %d, want -1", m.selected)
 		}
 		titles := getTitles(t)
-		want := []string{"B", "C", "A", "D"}
+		// Move inserts the selected slide BEFORE the cursor's slide, so
+		// A ends up between B (was at cursor's left) and C (was the cursor).
+		want := []string{"B", "A", "C", "D"}
 		if !equal(titles, want) {
 			t.Errorf("got %v, want %v", titles, want)
+		}
+	})
+
+	t.Run("move backward inserts before cursor", func(t *testing.T) {
+		m := setupUIModel(t)
+		// Move cursor to slide 3 (C), select it, then move cursor to A and m.
+		m, _ = update(m, key("j"))
+		m, _ = update(m, key("j"))
+		m, _ = update(m, key(" "))
+		if m.selected != 2 {
+			t.Fatalf("selected = %d, want 2", m.selected)
+		}
+		m, _ = update(m, key("k"))
+		m, _ = update(m, key("k"))
+		m, _ = update(m, key("m"))
+		titles := getTitles(t)
+		// C moves to slot 0, A/B shift down by one.
+		want := []string{"C", "A", "B", "D"}
+		if !equal(titles, want) {
+			t.Errorf("got %v, want %v", titles, want)
+		}
+		if m.cursor != 0 {
+			t.Errorf("cursor = %d, want 0 (follows moved slide)", m.cursor)
 		}
 	})
 
@@ -402,6 +427,153 @@ func TestUIScrolling(t *testing.T) {
 		}
 	})
 }
+
+func TestUICmdRunReadError(t *testing.T) {
+	setupTestFs(t, testFixture)
+	cmd := UICmd{Dir: "does-not-exist/"}
+	if err := cmd.Run(); err == nil {
+		t.Fatal("expected error for missing dir")
+	}
+}
+
+func TestUIInit(t *testing.T) {
+	m := setupUIModel(t)
+	if cmd := m.Init(); cmd != nil {
+		t.Errorf("Init() = %v, want nil", cmd)
+	}
+}
+
+func TestUIUpdateIgnoresOtherMessages(t *testing.T) {
+	m := setupUIModel(t)
+	// Send a message that's neither WindowSizeMsg nor KeyMsg.
+	model, cmd := m.Update("not a recognized message")
+	got := model.(uiModel)
+	if got.cursor != m.cursor || cmd != nil {
+		t.Errorf("non-key non-resize message should be a noop, got cursor=%d cmd=%v",
+			got.cursor, cmd)
+	}
+}
+
+func TestUISelectedNavigation(t *testing.T) {
+	t.Run("up in selected mode", func(t *testing.T) {
+		m := setupUIModel(t)
+		m, _ = update(m, key("j"))
+		m, _ = update(m, key(" ")) // enter selected mode
+		if m.selected != 1 {
+			t.Fatalf("selected = %d, want 1", m.selected)
+		}
+		m, _ = update(m, key("k"))
+		if m.cursor != 0 {
+			t.Errorf("cursor = %d, want 0", m.cursor)
+		}
+		if m.selected != 1 {
+			t.Errorf("selected = %d, want 1 (anchor stays)", m.selected)
+		}
+	})
+
+	t.Run("up at top in selected mode clamps", func(t *testing.T) {
+		m := setupUIModel(t)
+		m, _ = update(m, key(" "))
+		m, _ = update(m, key("k"))
+		if m.cursor != 0 {
+			t.Errorf("cursor = %d, want 0", m.cursor)
+		}
+	})
+
+	t.Run("down at bottom in selected mode clamps", func(t *testing.T) {
+		m := setupUIModel(t)
+		for range 3 {
+			m, _ = update(m, key("j"))
+		}
+		m, _ = update(m, key(" "))
+		m, _ = update(m, key("j"))
+		if m.cursor != 3 {
+			t.Errorf("cursor = %d, want 3", m.cursor)
+		}
+	})
+
+	t.Run("arrow down in selected mode", func(t *testing.T) {
+		m := setupUIModel(t)
+		m, _ = update(m, key(" "))
+		m, _ = update(m, specialKey(tea.KeyDown))
+		if m.cursor != 1 {
+			t.Errorf("cursor = %d, want 1", m.cursor)
+		}
+	})
+}
+
+func TestUIViewSelectedHelp(t *testing.T) {
+	m := setupUIModel(t)
+	m, _ = update(m, key(" "))
+	m.width = 80
+	view := m.View()
+	if !strings.Contains(view, "esc cancel") {
+		t.Errorf("expected selected-mode help text, got:\n%s", view)
+	}
+}
+
+func TestUIViewRendersSelectedRow(t *testing.T) {
+	m := setupUIModel(t)
+	m, _ = update(m, key(" ")) // select slide 0
+	// Move cursor away so slide 0 renders with selectedStyle (not cursorStyle).
+	m, _ = update(m, key("j"))
+	m.width = 80
+	view := m.View()
+	// Both A (selected) and B (cursor) should be present.
+	if !strings.Contains(view, "A") || !strings.Contains(view, "B") {
+		t.Errorf("expected both A and B in view, got:\n%s", view)
+	}
+}
+
+func TestUIViewRendersError(t *testing.T) {
+	m := setupUIModel(t)
+	m.width = 80
+	// Force the model into an error state by deleting the only slide.
+	setupTestFs(t, `---
+theme: default
+---
+
+# Solo
+`)
+	d, file, err := readDeck("")
+	if err != nil {
+		t.Fatalf("readDeck: %v", err)
+	}
+	m = newUIModel(d.Slides, d.Metadata, file)
+	m.width = 80
+	m, _ = update(m, key("d"))
+	if m.err == nil {
+		t.Fatal("expected err to be set")
+	}
+	view := m.View()
+	if !strings.Contains(view, "Error:") {
+		t.Errorf("expected error text in view, got:\n%s", view)
+	}
+}
+
+func TestUIVisibleLinesAccountsForErrorLine(t *testing.T) {
+	setupTestFs(t, `---
+theme: default
+---
+
+# Solo
+`)
+	d, file, _ := readDeck("")
+	m := newUIModel(d.Slides, d.Metadata, file)
+	m.height = 20
+	noErr := m.visibleLines()
+	m.err = errFromString("kaboom")
+	withErr := m.visibleLines()
+	if withErr != noErr-2 {
+		t.Errorf("error should subtract 2 lines: noErr=%d withErr=%d", noErr, withErr)
+	}
+}
+
+// errFromString is a tiny error helper kept local to keep imports clean.
+type stringErr string
+
+func (e stringErr) Error() string { return string(e) }
+func errFromString(s string) error { return stringErr(s) }
 
 func TestUIIntegration(t *testing.T) {
 	t.Run("nudge writes to disk", func(t *testing.T) {

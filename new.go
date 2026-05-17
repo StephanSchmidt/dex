@@ -15,6 +15,14 @@ type NewCmd struct {
 	Title string `arg:"" optional:"" help:"Presentation title (e.g. 'My Talk')."`
 }
 
+// runScaffoldCmd executes the post-scaffold command. Overridable in tests.
+var runScaffoldCmd = func(args []string) error {
+	cmd := exec.Command(args[0], args[1:]...) // #nosec G204 -- args from trusted format
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
+}
+
 func (c *NewCmd) Run() error {
 	title := c.Title
 	if title == "" {
@@ -59,10 +67,7 @@ func (c *NewCmd) Run() error {
 
 	if args := activeFormat.PostScaffoldCmd(); len(args) > 0 {
 		fmt.Fprintf(stdout, "Running %s...\n", strings.Join(args, " "))
-		cmd := exec.Command(args[0], args[1:]...) // #nosec G204 -- args from trusted format
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
-		if err := cmd.Run(); err != nil {
+		if err := runScaffoldCmd(args); err != nil {
 			return fmt.Errorf("running %s: %w", strings.Join(args, " "), err)
 		}
 	}

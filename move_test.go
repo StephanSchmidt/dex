@@ -186,4 +186,61 @@ func TestMove(t *testing.T) {
 			t.Errorf("got %v, want %v", titles, want)
 		}
 	})
+
+	t.Run("combined form with both To and File errors", func(t *testing.T) {
+		// From:to with non-empty To AND File is ambiguous and should error.
+		setupTestFs(t, testFixture)
+		cmd := MoveCmd{From: "1:2", To: "ignored", File: "slides.md"}
+		if err := cmd.Run(); err == nil {
+			t.Fatal("expected error when from:to is combined with separate to + file")
+		}
+	})
+
+	t.Run("missing target", func(t *testing.T) {
+		setupTestFs(t, testFixture)
+		cmd := MoveCmd{From: "1", File: "slides.md"}
+		if err := cmd.Run(); err == nil {
+			t.Fatal("expected error for missing target")
+		}
+	})
+
+	t.Run("read error on missing file", func(t *testing.T) {
+		setupTestFs(t, testFixture)
+		cmd := MoveCmd{From: "1", To: "2", File: "nope.md"}
+		if err := cmd.Run(); err == nil {
+			t.Fatal("expected error for missing file")
+		}
+	})
+
+	t.Run("invalid from", func(t *testing.T) {
+		setupTestFs(t, testFixture)
+		cmd := MoveCmd{From: "abc", To: "2", File: "slides.md"}
+		if err := cmd.Run(); err == nil {
+			t.Fatal("expected error for non-numeric from")
+		}
+	})
+
+	t.Run("invalid end- offset", func(t *testing.T) {
+		setupTestFs(t, testFixture)
+		cmd := MoveCmd{From: "1", To: "end-abc", File: "slides.md"}
+		if err := cmd.Run(); err == nil {
+			t.Fatal("expected error for non-numeric end- offset")
+		}
+	})
+
+	t.Run("invalid relative offset", func(t *testing.T) {
+		setupTestFs(t, testFixture)
+		cmd := MoveCmd{From: "1", To: "+abc", File: "slides.md"}
+		if err := cmd.Run(); err == nil {
+			t.Fatal("expected error for non-numeric relative offset")
+		}
+	})
+
+	t.Run("invalid absolute target", func(t *testing.T) {
+		setupTestFs(t, testFixture)
+		cmd := MoveCmd{From: "1", To: "abc", File: "slides.md"}
+		if err := cmd.Run(); err == nil {
+			t.Fatal("expected error for non-numeric absolute target")
+		}
+	})
 }
