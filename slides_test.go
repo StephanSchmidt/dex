@@ -9,7 +9,7 @@ func TestSlides(t *testing.T) {
 		if err := cmd.Run(); err != nil {
 			t.Fatalf("SlidesCmd.Run() error: %v", err)
 		}
-		want := "  1  A\n  2  B\n  3  C\n  4  D\n"
+		want := "Test\n  1  A\n  2  B\n  3  C\n  4  D\n"
 		if got := buf.String(); got != want {
 			t.Errorf("SlidesCmd output:\ngot:  %q\nwant: %q", got, want)
 		}
@@ -22,7 +22,7 @@ func TestSlides(t *testing.T) {
 		if err := cmd.Run(); err != nil {
 			t.Fatalf("SlidesCmd.Run() error: %v", err)
 		}
-		want := "  1  A\n  2  B\n  3  C\n  4  D\n"
+		want := "Test\n  1  A\n  2  B\n  3  C\n  4  D\n"
 		if got := buf.String(); got != want {
 			t.Errorf("SlidesCmd output:\ngot:  %q\nwant: %q", got, want)
 		}
@@ -34,7 +34,7 @@ func TestSlides(t *testing.T) {
 		if err := cmd.Run(); err != nil {
 			t.Fatalf("SlidesCmd.Run() error: %v", err)
 		}
-		want := "  1  A\n  3  C\n"
+		want := "Test\n  1  A\n  3  C\n"
 		if got := buf.String(); got != want {
 			t.Errorf("SlidesCmd output:\ngot:  %q\nwant: %q", got, want)
 		}
@@ -47,7 +47,7 @@ func TestSlides(t *testing.T) {
 		if err := cmd.Run(); err != nil {
 			t.Fatalf("SlidesCmd.Run() error: %v", err)
 		}
-		want := "  1  A\n  3  C\n  2  B\n  3  C\n  4  D\n"
+		want := "Test\n  1  A\n  3  C\nTest\n  2  B\n  3  C\n  4  D\n"
 		if got := buf.String(); got != want {
 			t.Errorf("SlidesCmd output:\ngot:  %q\nwant: %q", got, want)
 		}

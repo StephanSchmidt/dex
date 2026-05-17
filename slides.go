@@ -19,6 +19,10 @@ func (c *SlidesCmd) Run() error {
 			return err
 		}
 
+		if title := activeFormat.DeckTitle(d); title != "" {
+			fmt.Fprintf(stdout, "%s\n", title)
+		}
+
 		if rangeExpr == "" {
 			for i, s := range d.Slides {
 				fmt.Fprintf(stdout, "%3d  %s\n", i+1, displayTitle(s))

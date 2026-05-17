@@ -163,6 +163,35 @@ func TestExtractTitle(t *testing.T) {
 		{"h1 precedence over h2", format.Slide{Content: "<h2>Second</h2><h1>First</h1>"}, "First"},
 		{"no heading", format.Slide{Content: "<p>Just text</p>"}, "(untitled)"},
 		{"empty", format.Slide{}, "(untitled)"},
+		{"br becomes space", format.Slide{Content: "<h2>The new<br>roles.</h2>"}, "The new roles."},
+		{"br self-closing", format.Slide{Content: "<h2>One<br/>two<br />three</h2>"}, "One two three"},
+		{"br with inline tags", format.Slide{Content: "<h2>Worked example:<br>a <em>checkout team</em>.</h2>"}, "Worked example: a checkout team."},
+		{"collapses whitespace", format.Slide{Content: "<h1>  spaced   out  </h1>"}, "spaced out"},
+		{
+			name:  "data-menu-title fallback",
+			slide: format.Slide{Metadata: `class="quote-slide" data-menu-title="Quote intro"`, Content: "<blockquote>...</blockquote>"},
+			want:  "Quote intro",
+		},
+		{
+			name:  "aria-label fallback",
+			slide: format.Slide{Metadata: `class="stat" aria-label="Big number"`, Content: "<p>42%</p>"},
+			want:  "Big number",
+		},
+		{
+			name:  "title attribute fallback",
+			slide: format.Slide{Metadata: `title="Tooltip title"`, Content: "<p>body</p>"},
+			want:  "Tooltip title",
+		},
+		{
+			name:  "heading wins over data-menu-title",
+			slide: format.Slide{Metadata: `data-menu-title="From metadata"`, Content: "<h2>From heading</h2>"},
+			want:  "From heading",
+		},
+		{
+			name:  "data-menu-title wins over aria-label",
+			slide: format.Slide{Metadata: `data-menu-title="Menu" aria-label="Aria"`, Content: "<p>body</p>"},
+			want:  "Menu",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

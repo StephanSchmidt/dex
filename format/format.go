@@ -33,6 +33,7 @@ type Format interface {
 	Parse(data []byte) Deck
 	Render(d Deck) []byte
 	ExtractTitle(s Slide) string
+	DeckTitle(d Deck) string
 	DefaultFile() string
 	RenderSlide(s Slide) string
 	RenameSlide(s Slide, name string) Slide

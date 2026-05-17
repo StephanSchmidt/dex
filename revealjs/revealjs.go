@@ -65,25 +65,72 @@ func (Format) Render(d format.Deck) []byte {
 	return []byte(result)
 }
 
-// ExtractTitle returns the title from slide content, looking for h1
-// first, then h2.
+// ExtractTitle returns the title from slide content. It tries, in
+// order: <h1>, <h2>, the section's data-menu-title (reveal.js menu
+// plugin convention), aria-label, and the global title attribute.
+// <br> tags inside headings are treated as spaces.
 func (Format) ExtractTitle(s format.Slide) string {
-	doc, err := goquery.NewDocumentFromReader(strings.NewReader("<div>" + s.Content + "</div>"))
-	if err != nil {
-		return "(untitled)"
+	content := brReplacer.Replace(s.Content)
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader("<div>" + content + "</div>"))
+	if err == nil {
+		if h1 := doc.Find("h1").First(); h1.Length() > 0 {
+			return collapseSpaces(h1.Text())
+		}
+		if h2 := doc.Find("h2").First(); h2.Length() > 0 {
+			return collapseSpaces(h2.Text())
+		}
 	}
-	if h1 := doc.Find("h1").First(); h1.Length() > 0 {
-		return h1.Text()
-	}
-	if h2 := doc.Find("h2").First(); h2.Length() > 0 {
-		return h2.Text()
+	for _, attr := range []string{"data-menu-title", "aria-label", "title"} {
+		if v := metadataAttr(s.Metadata, attr); v != "" {
+			return collapseSpaces(v)
+		}
 	}
 	return "(untitled)"
+}
+
+// metadataAttr looks up an attribute value in a slide's serialized
+// section attributes (e.g. `class="x" data-menu-title="Foo"`).
+func metadataAttr(metadata, attr string) string {
+	if metadata == "" {
+		return ""
+	}
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader("<section " + metadata + "></section>"))
+	if err != nil {
+		return ""
+	}
+	v, _ := doc.Find("section").First().Attr(attr)
+	return v
+}
+
+var brReplacer = strings.NewReplacer(
+	"<br>", " ", "<br/>", " ", "<br />", " ",
+	"<BR>", " ", "<BR/>", " ", "<BR />", " ",
+)
+
+func collapseSpaces(s string) string {
+	return strings.Join(strings.Fields(s), " ")
 }
 
 // DefaultFile returns the default presentation filename for reveal.js.
 func (Format) DefaultFile() string {
 	return "index.html"
+}
+
+// DeckTitle returns the contents of the HTML <title> element, or "" if
+// the deck has no title.
+func (Format) DeckTitle(d format.Deck) string {
+	if d.Metadata == "" {
+		return ""
+	}
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(d.Metadata))
+	if err != nil {
+		return ""
+	}
+	t := doc.Find("title").First()
+	if t.Length() == 0 {
+		return ""
+	}
+	return collapseSpaces(t.Text())
 }
 
 // RenderSlide outputs a single slide as a reveal.js <section>.
