@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/dex-logo.svg" alt="dex" width="360">
+</p>
+
 # dex
 
 A CLI tool for manipulating slide presentations ([Slidev](https://sli.dev) markdown and [reveal.js](https://revealjs.com) HTML).
