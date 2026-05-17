@@ -13,7 +13,13 @@ import (
 // aren't mis-parsed as dir + range.
 func splitDirRange(expr string) (dir, rangeExpr string) {
 	if expr != "" {
-		if info, err := appFs.Stat(expr); err == nil && !info.IsDir() {
+		if info, err := appFs.Stat(expr); err == nil {
+			if info.IsDir() {
+				if !strings.HasSuffix(expr, "/") {
+					return expr + "/", ""
+				}
+				return expr, ""
+			}
 			return expr, ""
 		}
 	}

@@ -62,6 +62,7 @@ Negative positions work everywhere — for insert/copy targets, `-1` means appen
 ```sh
 dex slides                  # list all slides in ./slides.md
 dex slides acme/            # list slides in acme/slides.md
+dex slides talks/*          # list every deck under talks/ (skips non-deck files)
 dex slide 3                 # print raw markdown of slide 3
 dex copy dir1/1-3 dir2/5    # copy slides 1-3 from dir1, insert before slide 5 in dir2
 dex delete 3                # delete slide 3
