@@ -45,6 +45,26 @@ title: Test2
 # Z
 `
 
+// fixtureCodeBlock contains a slide with a fenced code block that has ---
+// inside it. The parser must not treat those as slide delimiters.
+const fixtureCodeBlock = `---
+theme: default
+title: Code Block Test
+---
+
+# Slide One
+
+` + "```yaml" + `
+key: value
+---
+other: stuff
+` + "```" + `
+
+---
+
+# Slide Two
+`
+
 var f Format
 
 func TestParse(t *testing.T) {
@@ -81,6 +101,33 @@ func TestParse(t *testing.T) {
 		}
 		if got := s.Content; got != "\n# C\n\n" {
 			t.Errorf("slide 3 content: got %q", got)
+		}
+	})
+
+	t.Run("code block with --- not treated as delimiter", func(t *testing.T) {
+		d := f.Parse([]byte(fixtureCodeBlock))
+		if got := len(d.Slides); got != 2 {
+			t.Fatalf("got %d slides, want 2", got)
+		}
+		// The first slide must contain the full code block with the --- line.
+		if !strings.Contains(d.Slides[0].Content, "```") {
+			t.Errorf("slide 1 should contain code fence, got %q", d.Slides[0].Content)
+		}
+		if !strings.Contains(d.Slides[0].Content, "other: stuff") {
+			t.Errorf("slide 1 should contain code block content after ---, got %q", d.Slides[0].Content)
+		}
+	})
+
+	t.Run("round-trip with code block", func(t *testing.T) {
+		d := f.Parse([]byte(fixtureCodeBlock))
+		r1 := f.Render(d)
+		d2 := f.Parse(r1)
+		if len(d.Slides) != len(d2.Slides) {
+			t.Fatalf("round-trip slide count: got %d, want %d", len(d2.Slides), len(d.Slides))
+		}
+		r2 := f.Render(d2)
+		if string(r1) != string(r2) {
+			t.Errorf("not idempotent:\nfirst:  %q\nsecond: %q", r1, r2)
 		}
 	})
 

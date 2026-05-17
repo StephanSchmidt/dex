@@ -29,8 +29,13 @@ func (Format) Parse(data []byte) format.Deck {
 	if len(lines) > 0 && lines[len(lines)-1] == "" {
 		lines = lines[:len(lines)-1]
 	}
+	inCodeBlock := false
 	for _, line := range lines {
-		if strings.TrimSpace(line) == "---" {
+		trimmed := strings.TrimSpace(line)
+		if strings.HasPrefix(trimmed, "```") || strings.HasPrefix(trimmed, "~~~") {
+			inCodeBlock = !inCodeBlock
+		}
+		if !inCodeBlock && trimmed == "---" {
 			blocks = append(blocks, cur.String())
 			cur.Reset()
 		} else {
@@ -98,6 +103,15 @@ func (Format) ExtractTitle(s format.Slide) string {
 		return strings.TrimSpace(m[1])
 	}
 	return "(untitled)"
+}
+
+// DeckTitle returns the deck-level title: from the slidev frontmatter,
+// or "" if no title is set.
+func (Format) DeckTitle(d format.Deck) string {
+	if m := metaTitleRe.FindStringSubmatch(d.Metadata); m != nil {
+		return strings.TrimSpace(m[1])
+	}
+	return ""
 }
 
 // DefaultFile returns the default presentation filename for Slidev.
