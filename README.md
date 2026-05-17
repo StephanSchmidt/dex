@@ -10,12 +10,12 @@ A CLI tool for manipulating slide presentations ([Slidev](https://sli.dev) markd
 
 | Command | Description | Example |
 |---------|-------------|---------|
-| `slides` | List slide numbers and titles | `dex slides acme/` |
+| `slides` | List deck title and slide numbers/titles | `dex slides acme/` |
 | `slide` | Print raw slide content | `dex slide 3` |
 | `copy` | Copy slides between decks | `dex copy dir1/1-3 dir2/5` |
 | `delete` | Delete slides from a deck | `dex delete 3` |
 | `insert` | Insert a new blank slide at a position | `dex insert 3 "New Slide"`, `dex insert -1 "End"` |
-| `move` | Reorder slides within a deck | `dex move 2 4`, `dex move -1 1` |
+| `move` | Reorder slides within a deck | `dex move 2 4`, `dex move 1 end`, `dex move 1:-1` |
 | `rename` | Rename the deck title | `dex rename "New Title"` |
 | `rename-slide` | Rename a slide's title | `dex rename-slide 3 "Hi"` |
 | `swap` | Swap two slides (same or different decks) | `dex swap 1 3` |
@@ -73,6 +73,9 @@ dex move 2 4                # move slide 2 to position 4
 dex move -1 1               # move last slide to the front
 dex move 2 +1               # move slide 2 down by one position
 dex move 4 -2               # move slide 4 up by two positions
+dex move 1 end              # move slide 1 to the back
+dex move 1 end-1            # move slide 1 to second-from-last
+dex move 1:end              # combined from:to form (also lets you write 1:-1)
 dex rename "New Title"          # rename the deck title in metadata
 dex rename "New Title" acme/    # rename deck in acme/slides.md
 dex rename-slide 3 "New Title"  # rename slide 3
