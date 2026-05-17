@@ -7,8 +7,16 @@ import (
 )
 
 // splitDirRange splits "dir/range" into ("dir/", "range"). If there is
-// no "/" the dir part is empty and the whole string is the range.
+// no "/" the dir part is empty and the whole string is the range. If the
+// full expression points to an existing file, it is returned as the dir
+// with an empty range — so explicit file paths like "slides/deck.html"
+// aren't mis-parsed as dir + range.
 func splitDirRange(expr string) (dir, rangeExpr string) {
+	if expr != "" {
+		if info, err := appFs.Stat(expr); err == nil && !info.IsDir() {
+			return expr, ""
+		}
+	}
 	i := strings.LastIndex(expr, "/")
 	if i < 0 {
 		return "", expr
